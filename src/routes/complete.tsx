@@ -78,6 +78,21 @@ function CompletePage() {
           })}
         </ul>
 
+        {masterCode && (
+          <div className="card-soft space-y-3 border-success/40 p-5 text-left" aria-label="Completion code">
+            <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-success">All devices finished</p>
+            <p className="text-xl font-black">Your completion code</p>
+            <div className="flex flex-wrap items-center gap-3">
+              <code className="rounded-xl bg-success-soft px-4 py-2 text-2xl font-black tracking-widest">{masterCode}</code>
+              <CopyButton text={summaryText(progress)} label="Copy completion summary" />
+            </div>
+            <p className="text-base font-semibold text-muted-foreground">
+              Send this code in your reply to Field Support. They will confirm everything is recorded and close your
+              ticket.
+            </p>
+          </div>
+        )}
+
         <div className="rounded-2xl bg-primary-soft p-4 text-left">
           <p className="text-base font-extrabold">If anything seems off, we're still here.</p>
           <p className="text-sm font-semibold text-muted-foreground">Field Support can help after the migration too, you never have to guess.</p>
