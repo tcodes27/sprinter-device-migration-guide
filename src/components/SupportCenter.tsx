@@ -34,11 +34,8 @@ import { cn } from "@/lib/utils";
 export function SupportCenter() {
   const { isOpen, open, close, view, setView, issue, setIssue, location } = useSupport();
   const pathname = useLocation({ select: (state) => state.pathname });
-  const [launcherDismissed, setLauncherDismissed] = useState(false);
-
-  useEffect(() => {
-    setLauncherDismissed(false);
-  }, [pathname]);
+  const [dismissedPath, setDismissedPath] = useState<string | null>(null);
+  const launcherDismissed = dismissedPath === pathname;
 
   const titleFor: Record<SupportView, string> = {
     menu: "Need help?",
@@ -73,7 +70,7 @@ export function SupportCenter() {
             <Button
               type="button"
               size="icon"
-              onClick={() => setLauncherDismissed(true)}
+              onClick={() => setDismissedPath(pathname)}
               className="h-auto min-h-12 w-11 rounded-none rounded-r-full border-l border-primary-foreground/30 px-0 shadow-none sm:min-h-14 sm:w-12"
               aria-label="Hide floating Help button on this page"
             >
