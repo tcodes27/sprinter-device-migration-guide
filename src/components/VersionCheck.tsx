@@ -1,4 +1,4 @@
-import { useState } from "react";
+
 import { AnimatePresence, motion } from "motion/react";
 import { Check, ChevronRight, CircleHelp, Headset, RotateCcw, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -6,19 +6,20 @@ import { approvedSoftwareVersion, versionCheck } from "@/content/config";
 import { useSupport } from "@/lib/support";
 import { cn } from "@/lib/utils";
 
-type Answer = "matches" | "noMatch" | "dontKnow" | null;
+export type VersionAnswer = "matches" | "noMatch" | "dontKnow";
 
 type Props = {
   deviceName: string;
-  verified: boolean;
+  /** Saved answer, restored on return */
+  answer: VersionAnswer | null;
   onVerified: () => void;
+  onAnswer: (a: Exclude<VersionAnswer, "matches">) => void;
   onBackToUpdate: () => void;
   onShowMe: () => void;
 };
 
 /** "Update complete?", the Sprinter confirms the version. The app never assumes the update worked. */
-export function VersionCheck({ deviceName, verified, onVerified, onBackToUpdate, onShowMe }: Props) {
-  const [answer, setAnswer] = useState<Answer>(verified ? "matches" : null);
+export function VersionCheck({ deviceName, answer, onVerified, onAnswer, onBackToUpdate, onShowMe }: Props) {
   const { open } = useSupport();
   const instruction = approvedSoftwareVersion ? versionCheck.approvedInstruction(approvedSoftwareVersion) : versionCheck.fallbackInstruction;
 
@@ -40,9 +41,9 @@ export function VersionCheck({ deviceName, verified, onVerified, onBackToUpdate,
 
       <p className="text-lg font-extrabold">{versionCheck.question}</p>
       <div className="grid gap-2 sm:grid-cols-3">
-        <Choice active={answer === "matches"} tone="success" icon={<Check aria-hidden />} label={versionCheck.matches} onClick={() => { setAnswer("matches"); onVerified(); }} />
-        <Choice active={answer === "noMatch"} tone="warning" icon={<X aria-hidden />} label={versionCheck.noMatch} onClick={() => setAnswer("noMatch")} />
-        <Choice active={answer === "dontKnow"} tone="primary" icon={<CircleHelp aria-hidden />} label={versionCheck.dontKnow} onClick={() => { setAnswer("dontKnow"); onShowMe(); }} />
+        <Choice active={answer === "matches"} tone="success" icon={<Check aria-hidden />} label={versionCheck.matches} onClick={onVerified} />
+        <Choice active={answer === "noMatch"} tone="warning" icon={<X aria-hidden />} label={versionCheck.noMatch} onClick={() => onAnswer("noMatch")} />
+        <Choice active={answer === "dontKnow"} tone="primary" icon={<CircleHelp aria-hidden />} label={versionCheck.dontKnow} onClick={() => { onAnswer("dontKnow"); onShowMe(); }} />
       </div>
 
       <AnimatePresence mode="wait">
