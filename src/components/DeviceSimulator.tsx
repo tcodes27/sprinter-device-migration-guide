@@ -105,7 +105,6 @@ export function DeviceSimulator({
         }
       }
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [sequence, reduce, onComplete, onScreenPassed],
   );
 

@@ -30,4 +30,4 @@
 - [x] Move visual troubleshooting and enlargement controls into the demo
 - [x] Remove optional Why and What happens next controls
 - [x] Prevent Help and workflow actions from overlapping
-- [ ] Verify mobile and desktop layouts and interactions
+- [x] Verify mobile and desktop layouts and interactions
