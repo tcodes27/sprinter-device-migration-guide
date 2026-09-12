@@ -48,6 +48,8 @@ function normalize(raw: Partial<Record<DeviceId, LegacyDevice>>): ProgressState 
     if (!Array.isArray(p.completed)) p.completed = [];
     if (!p.checkpoints || typeof p.checkpoints !== "object" || Array.isArray(p.checkpoints)) p.checkpoints = {};
     if (!p.answers || typeof p.answers !== "object" || Array.isArray(p.answers)) p.answers = {};
+    if (typeof p.confirmationCode !== "string") p.confirmationCode = null;
+    if (typeof p.completedAt !== "string") p.completedAt = null;
     // Migrate older saves: hand-ticked boxes and finished practice devices become checkpoints.
     if (checks && typeof checks === "object") {
       for (const [id, list] of Object.entries(checks)) if (Array.isArray(list)) p.checkpoints[id] = union(p.checkpoints[id] ?? [], list);
@@ -130,8 +132,25 @@ export const progressActions = {
       const total = totalSteps(device, d);
       const completed = d.completed.includes(index) ? d.completed : [...d.completed, index];
       const isLast = index >= total - 1;
-      return { ...d, started: true, completed, current: isLast ? index : index + 1, finished: isLast || d.finished };
+      const nowFinished = isLast || d.finished;
+      return {
+        ...d,
+        started: true,
+        completed,
+        current: isLast ? index : index + 1,
+        finished: nowFinished,
+        confirmationCode: nowFinished ? (d.confirmationCode ?? deviceConfirmationCode(device)) : d.confirmationCode,
+        completedAt: nowFinished ? (d.completedAt ?? new Date().toISOString()) : d.completedAt,
+      };
     });
+  },
+  /** Issues a confirmation code for a finished device that predates codes (older saves, demo data). */
+  ensureConfirmation(device: DeviceId) {
+    update(device, (d) =>
+      d.finished && !d.confirmationCode
+        ? { ...d, confirmationCode: deviceConfirmationCode(device), completedAt: d.completedAt ?? new Date().toISOString() }
+        : d,
+    );
   },
   /** A version match: remembers the answer, ticks the decision checkpoint and unlocks the step. */
   markVerified(device: DeviceId, index: number, stepId: string) {
