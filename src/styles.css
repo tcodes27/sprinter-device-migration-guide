@@ -145,8 +145,76 @@
   animation: gentle-pulse 2.4s ease-in-out infinite;
 }
 
+/* Tap target glow on the practice device */
+@keyframes tap-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 0 3px oklch(0.72 0.15 70 / 90%), 0 0 0 6px oklch(0.72 0.15 70 / 0%);
+  }
+  50% {
+    box-shadow: 0 0 0 3px oklch(0.72 0.15 70 / 90%), 0 0 0 12px oklch(0.72 0.15 70 / 0%);
+  }
+}
+
+@utility tap-glow {
+  animation: tap-glow 1.6s ease-in-out infinite;
+  position: relative;
+  z-index: 1;
+}
+
+@keyframes wiggle {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  20% {
+    transform: translateX(-5px);
+  }
+  40% {
+    transform: translateX(5px);
+  }
+  60% {
+    transform: translateX(-3px);
+  }
+  80% {
+    transform: translateX(3px);
+  }
+}
+
+@utility wiggle {
+  animation: wiggle 0.45s ease-in-out;
+}
+
+@keyframes draw-check {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@utility draw-check {
+  stroke-dasharray: 30;
+  stroke-dashoffset: 30;
+  animation: draw-check 0.45s ease-out forwards;
+}
+
+@utility no-scrollbar {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .pulse-current {
+  .pulse-current,
+  .wiggle {
+    animation: none;
+  }
+  .tap-glow {
+    animation: none;
+    box-shadow: 0 0 0 3px oklch(0.72 0.15 70 / 90%);
+  }
+  .draw-check {
+    stroke-dashoffset: 0;
     animation: none;
   }
   *,
