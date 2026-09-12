@@ -129,18 +129,41 @@ export const progressActions = {
       return { ...d, started: true, completed, current: isLast ? index : index + 1, finished: isLast || d.finished };
     });
   },
-  markSimDone(device: DeviceId, index: number) {
-    update(device, (d) => (d.simDone.includes(index) ? d : { ...d, simDone: [...d.simDone, index] }));
+  /** A version match: remembers the answer, ticks the decision checkpoint and unlocks the step. */
+  markVerified(device: DeviceId, index: number, stepId: string) {
+    update(device, (d) => ({
+      ...d,
+      verified: d.verified.includes(index) ? d.verified : [...d.verified, index],
+      checkpoints: { ...d.checkpoints, [stepId]: union(d.checkpoints[stepId] ?? [], [0]) },
+      answers: { ...d.answers, [stepId]: "matches" },
+    }));
   },
-  markVerified(device: DeviceId, index: number) {
-    update(device, (d) => (d.verified.includes(index) ? d : { ...d, verified: [...d.verified, index] }));
+  /** A "no match" or "don't know" answer is remembered but never ticks the checkpoint. */
+  setAnswer(device: DeviceId, stepId: string, answer: VerifyAnswer) {
+    update(device, (d) => ({ ...d, answers: { ...d.answers, [stepId]: answer } }));
   },
-  toggleCheck(device: DeviceId, stepId: string, item: number) {
+  completeCheckpoint(device: DeviceId, stepId: string, item: number) {
     update(device, (d) => {
-      const list = d.checks[stepId] ?? [];
-      const next = list.includes(item) ? list.filter((i) => i !== item) : [...list, item];
-      return { ...d, checks: { ...d.checks, [stepId]: next } };
+      const list = d.checkpoints[stepId] ?? [];
+      return list.includes(item) ? d : { ...d, checkpoints: { ...d.checkpoints, [stepId]: union(list, [item]) } };
     });
+  },
+  uncheckCheckpoint(device: DeviceId, stepId: string, item: number) {
+    update(device, (d) => {
+      const list = d.checkpoints[stepId] ?? [];
+      return list.includes(item) ? { ...d, checkpoints: { ...d.checkpoints, [stepId]: list.filter((i) => i !== item) } } : d;
+    });
+  },
+  toggleCheckpoint(device: DeviceId, stepId: string, item: number) {
+    update(device, (d) => {
+      const list = d.checkpoints[stepId] ?? [];
+      const next = list.includes(item) ? list.filter((i) => i !== item) : union(list, [item]);
+      return { ...d, checkpoints: { ...d.checkpoints, [stepId]: next } };
+    });
+  },
+  /** The Sprinter confirms every remaining task of a step (things the app cannot detect). */
+  confirmRemaining(device: DeviceId, stepId: string, count: number) {
+    update(device, (d) => ({ ...d, checkpoints: { ...d.checkpoints, [stepId]: Array.from({ length: count }, (_, i) => i) } }));
   },
   confirmGate(device: DeviceId, stepId: string) {
     update(device, (d) => ({ ...d, gates: d.gates.includes(stepId) ? d.gates : [...d.gates, stepId] }));
@@ -153,11 +176,14 @@ export const progressActions = {
   },
   loadDemo() {
     const s = emptyState();
-    const total = stepsFor(workflows.iphone, "update-reset").length;
+    const iphoneSteps = stepsFor(workflows.iphone, "update-reset");
+    const total = iphoneSteps.length;
     const all = Array.from({ length: total }, (_, i) => i);
-    s.iphone = { path: "update-reset", current: total - 1, completed: all, simDone: all, verified: [1], checks: {}, gates: ["reset"], finished: true, started: true };
+    const allDone = (steps: typeof iphoneSteps, upTo: number) => Object.fromEntries(steps.slice(0, upTo).map((st) => [st.id, checkpointsFor(st).map((c) => c.id)]));
+    s.iphone = { path: "update-reset", current: total - 1, completed: all, verified: [1], checkpoints: allDone(iphoneSteps, total), answers: { [iphoneSteps[1]!.id]: "matches" }, gates: ["reset"], finished: true, started: true };
     s["ipad-mini"] = { ...emptyDevice(), path: "update", started: true };
-    s["patient-ipad"] = { ...emptyDevice(), path: "update-reset", current: 1, completed: [0], simDone: [0], started: true };
+    const patientSteps = stepsFor(workflows["patient-ipad"], "update-reset");
+    s["patient-ipad"] = { ...emptyDevice(), path: "update-reset", current: 1, completed: [0], checkpoints: allDone(patientSteps, 1), started: true };
     save(s);
   },
 };
