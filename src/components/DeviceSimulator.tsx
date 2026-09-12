@@ -157,11 +157,7 @@ export function DeviceSimulator({ sequence, frame, resetKey, initiallyDone, onCo
         )}
       </div>
 
-      <motion.div
-        key={wrong}
-        className={cn("w-full", width, wrong > 0 && !reduce && "wiggle")}
-        animate={reduce ? undefined : { rotate: 0 }}
-      >
+      <div key={wrong} className={cn("w-full", width, wrong > 0 && !reduce && "wiggle")}>
         <div className={cn("relative overflow-hidden rounded-[2rem] border-[7px] border-deep bg-screen shadow-float", aspect)}>
           <div className="flex items-center justify-between px-4 pt-2 text-[10px] font-bold text-muted-foreground">
             <span>9:41</span>
