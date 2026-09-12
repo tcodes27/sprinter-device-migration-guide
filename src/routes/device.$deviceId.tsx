@@ -1,6 +1,8 @@
-import { createFileRoute, notFound } from "@tanstack/react-router";
-import { useEffect } from "react";
+import { createFileRoute, notFound, useNavigate } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import { StepView } from "@/components/StepView";
+import { DeviceChooser } from "@/components/DeviceChooser";
+import { SiteHeader } from "@/components/SiteHeader";
 import { isDeviceId, workflows } from "@/content/workflows";
 import { progressActions, useProgress } from "@/lib/progress";
 
@@ -29,13 +31,26 @@ export const Route = createFileRoute("/device/$deviceId")({
 function DevicePage() {
   const { deviceId } = Route.useParams();
   const progress = useProgress();
+  const navigate = useNavigate();
   const id = isDeviceId(deviceId) ? deviceId : "iphone";
   const workflow = workflows[id];
   const p = progress[id];
+  const [hydrated, setHydrated] = useState(false);
 
+  useEffect(() => setHydrated(true), []);
   useEffect(() => {
-    if (!p.started) progressActions.start(id);
-  }, [id, p.started]);
+    if (p.path && !p.started) progressActions.start(id);
+  }, [id, p.path, p.started]);
 
-  return <StepView workflow={workflow} progress={p} />;
+  // No path yet: the Sprinter tells us what IT asked before any step is shown.
+  if (!p.path) {
+    return (
+      <div className="min-h-screen">
+        <SiteHeader />
+        {hydrated && <DeviceChooser open device={id} onOpenChange={() => {}} onCancel={() => navigate({ to: "/" })} />}
+      </div>
+    );
+  }
+
+  return <StepView workflow={workflow} progress={p} path={p.path} />;
 }
