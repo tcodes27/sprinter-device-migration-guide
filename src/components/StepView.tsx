@@ -45,7 +45,7 @@ export function StepView({ workflow, progress, path }: Props) {
   const simDone = savedDone || sim.phase === "done" || !step.sequence;
   const canAdvance = isVerify ? verified : true;
   const isDone = progress.finished && index === total - 1;
-  const currentAction = step.sequence && !simDone ? step.sequence[Math.min(sim.index, step.sequence.length - 1)]?.hint : undefined;
+  const currentAction = step.sequence && !simDone && !gateNeeded ? step.sequence[Math.min(sim.index, step.sequence.length - 1)]?.hint : undefined;
 
   useSupportLocation({
     deviceId: workflow.id,
