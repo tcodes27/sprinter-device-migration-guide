@@ -1,10 +1,9 @@
 import { Link } from "@tanstack/react-router";
-import { Home, LifeBuoy, Smartphone } from "lucide-react";
+import { LifeBuoy, Smartphone } from "lucide-react";
 import { Logo } from "./Logo";
 
 const nav = [
-  { to: "/", label: "Home", icon: Home },
-  { to: "/devices", label: "My Devices", icon: Smartphone },
+  { to: "/", label: "My Devices", icon: Smartphone },
   { to: "/help", label: "Need Help", icon: LifeBuoy },
 ] as const;
 
