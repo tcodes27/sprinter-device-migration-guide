@@ -1,17 +1,16 @@
 import { Link } from "@tanstack/react-router";
-import { Home, LifeBuoy, Smartphone } from "lucide-react";
+import { LifeBuoy, Smartphone } from "lucide-react";
 import { Logo } from "./Logo";
 
 const nav = [
-  { to: "/", label: "Home", icon: Home },
-  { to: "/devices", label: "My Devices", icon: Smartphone },
+  { to: "/", label: "My Devices", icon: Smartphone },
   { to: "/help", label: "Need Help", icon: LifeBuoy },
 ] as const;
 
 export function SiteHeader() {
   return (
     <header className="sticky top-0 z-30 border-b bg-card/90 backdrop-blur">
-      <div className="mx-auto flex max-w-3xl items-center justify-between gap-3 px-4 py-3">
+      <div className="mx-auto flex max-w-5xl items-center justify-between gap-3 px-4 py-3">
         <Link to="/" aria-label="Sprinter Health Device Migration home">
           <Logo />
         </Link>

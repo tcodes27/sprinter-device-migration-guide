@@ -2,21 +2,21 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, RotateCcw, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SiteHeader } from "@/components/SiteHeader";
-import { DeviceCard } from "@/components/DeviceCard";
+import { DeviceLauncher } from "@/components/DeviceLauncher";
 import { deviceOrder } from "@/content/workflows";
 import { progressActions, useProgress } from "@/lib/progress";
 
 const script = [
-  "Select a device (try the Patient-Facing iPad — it needs a reset)",
-  "Start the workflow",
-  "Go backward with Back — completed steps stay checked",
-  "Go forward — you continue where you left off",
-  "Open “Why?”",
-  "Open “Show me” (what should I see?)",
-  "Open the floating “Need help?” button",
-  "Complete a step with the main button",
-  "Tap “Pause / come back later” — progress is saved",
-  "Finish all steps to see the completion screen",
+  "Tap a device tile (try the Patient-Facing iPad — it needs a reset)",
+  "Tap the glowing spot on the practice device to move through the screens",
+  "Tap somewhere wrong — the device wiggles and shows “Tap here”",
+  "Press “Watch me do it” to see it auto-play, then try it yourself",
+  "Watch the sub-actions check themselves off on the right",
+  "Notice the Next button fill in once the practice device is done",
+  "Reach the reset step — press and hold to confirm the safety gate",
+  "Open “Why?”, “Show me bigger”, and the floating “Need help?” button",
+  "Tap “Pause” — progress and practice-device completion are saved",
+  "Finish all steps to see the device-ready moment",
 ];
 
 export const Route = createFileRoute("/demo")({
@@ -26,6 +26,8 @@ export const Route = createFileRoute("/demo")({
       { name: "description", content: "Internal demonstration of the Sprinter Health device migration guide using sample data." },
       { property: "og:title", content: "Demo Mode — Sprinter Health Device Migration" },
       { property: "og:description", content: "Sample-data walkthrough for internal demonstration." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -37,7 +39,7 @@ function DemoPage() {
   return (
     <div className="min-h-screen pb-16">
       <SiteHeader />
-      <main className="mx-auto max-w-3xl space-y-6 px-4 pt-6">
+      <main className="mx-auto max-w-5xl space-y-6 px-4 pt-6">
         <header className="space-y-2">
           <p className="inline-flex items-center gap-2 rounded-full bg-warning-soft px-3 py-1 text-sm font-extrabold uppercase tracking-[0.18em] text-warning-foreground">
             <Sparkles className="h-4 w-4" aria-hidden /> Demo mode · sample data only
@@ -55,9 +57,9 @@ function DemoPage() {
           </Button>
         </div>
 
-        <section className="space-y-3">
+        <section className="grid gap-4 sm:grid-cols-3">
           {deviceOrder.map((d, i) => (
-            <DeviceCard key={d} id={d} progress={progress[d]} index={i} />
+            <DeviceLauncher key={d} id={d} progress={progress[d]} index={i} />
           ))}
         </section>
 
@@ -72,7 +74,7 @@ function DemoPage() {
             ))}
           </ol>
           <Button asChild variant="soft" size="lg" className="mt-4">
-            <Link to="/devices">Go to My Devices</Link>
+            <Link to="/">Go to device picker</Link>
           </Button>
         </section>
       </main>

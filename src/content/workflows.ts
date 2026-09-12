@@ -1,4 +1,5 @@
 import type { DeviceId, DeviceWorkflow, WorkflowStep } from "@/lib/workflow-types";
+import { buildSequences, deviceCopy } from "./sequences";
 
 /* ------------------------------------------------------------------ */
 /* Shared step pieces (kept as helpers so each device stays separate)  */
@@ -397,6 +398,16 @@ const patientIpadSteps: WorkflowStep[] = [
 
 /* ------------------------------------------------------------------ */
 
+function withSequences(device: DeviceId, steps: WorkflowStep[]): WorkflowStep[] {
+  const seqs = buildSequences(deviceCopy[device]);
+  return steps.map((s) => {
+    const sequence = seqs[s.id];
+    return sequence ? { ...s, sequence } : s;
+  });
+}
+
+const checklist = ["Device updated", "Reset completed if required", "Setup completed", "Configuration completed", "Device checked"];
+
 export const workflows: Record<DeviceId, DeviceWorkflow> = {
   iphone: {
     id: "iphone",
@@ -405,8 +416,8 @@ export const workflows: Record<DeviceId, DeviceWorkflow> = {
     description: "Your Sprinter Health iPhone",
     startLabel: "Update iPhone",
     frame: "phone",
-    steps: iphoneSteps,
-    completionChecklist: ["Device updated", "Reset completed if required", "Setup completed", "Configuration completed", "Device checked"],
+    steps: withSequences("iphone", iphoneSteps),
+    completionChecklist: checklist,
   },
   "ipad-mini": {
     id: "ipad-mini",
@@ -415,8 +426,8 @@ export const workflows: Record<DeviceId, DeviceWorkflow> = {
     description: "Your smaller iPad",
     startLabel: "Update iPad Mini",
     frame: "tablet",
-    steps: ipadMiniSteps,
-    completionChecklist: ["Device updated", "Reset completed if required", "Setup completed", "Configuration completed", "Device checked"],
+    steps: withSequences("ipad-mini", ipadMiniSteps),
+    completionChecklist: checklist,
   },
   "patient-ipad": {
     id: "patient-ipad",
@@ -425,8 +436,8 @@ export const workflows: Record<DeviceId, DeviceWorkflow> = {
     description: "The larger iPad used during patient visits",
     startLabel: "Update Patient-Facing iPad",
     frame: "tablet-wide",
-    steps: patientIpadSteps,
-    completionChecklist: ["Device updated", "Reset completed if required", "Setup completed", "Configuration completed", "Device checked"],
+    steps: withSequences("patient-ipad", patientIpadSteps),
+    completionChecklist: checklist,
   },
 };
 
