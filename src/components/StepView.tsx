@@ -288,7 +288,7 @@ export function StepView({ workflow, progress, path }: Props) {
           onClick={goNext}
           disabled={!canAdvance}
           className={cn(
-            "relative min-w-0 overflow-hidden transition-all max-sm:gap-1.5 max-sm:px-3",
+            "relative min-w-0 overflow-hidden transition-all max-sm:gap-1.5 max-sm:px-3 max-sm:text-base",
             stepDone && canAdvance && !isComplete && "shadow-float",
           )}
         >
