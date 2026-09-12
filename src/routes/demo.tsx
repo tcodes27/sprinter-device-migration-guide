@@ -1,10 +1,12 @@
+import { useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { ArrowRight, RotateCcw, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { SiteHeader } from "@/components/SiteHeader";
 import { DeviceLauncher } from "@/components/DeviceLauncher";
 import { deviceOrder } from "@/content/workflows";
-import { progressActions, useProgress } from "@/lib/progress";
+import { hasProgress, progressActions, useProgress } from "@/lib/progress";
 
 const script = [
   "Tap “Choose your device”, pick a device, then answer “What did IT ask you to do?”",
@@ -40,26 +42,54 @@ export const Route = createFileRoute("/demo")({
 function DemoPage() {
   const progress = useProgress();
   const navigate = useNavigate();
+  const anyProgress = deviceOrder.some((d) => hasProgress(progress[d]));
+  const [pending, setPending] = useState<"load" | "clear" | null>(null);
+
+  const run = (action: "load" | "clear") => {
+    if (action === "load") progressActions.loadDemo();
+    else progressActions.resetAll();
+    setPending(null);
+  };
+  const request = (action: "load" | "clear") => (anyProgress ? setPending(action) : run(action));
+
   return (
     <div className="min-h-screen pb-16">
       <SiteHeader />
       <main className="mx-auto max-w-5xl space-y-6 px-4 pt-6">
         <header className="space-y-2">
           <p className="inline-flex items-center gap-2 rounded-full bg-warning-soft px-3 py-1 text-sm font-extrabold uppercase tracking-[0.18em] text-warning-foreground">
-            <Sparkles className="h-4 w-4" aria-hidden /> Demo mode · sample data only
+            <Sparkles className="h-4 w-4" aria-hidden /> Internal demo mode · sample data only
           </p>
           <h1 className="text-4xl">Internal demonstration</h1>
-          <p className="text-lg text-muted-foreground">Load a sample Sprinter with three devices: iPhone complete, iPad Mini needs an update, Patient-Facing iPad needs a reset. Nothing here is connected to production systems.</p>
+          <p className="text-lg text-muted-foreground">For Sprinter Health staff demonstrations, not part of the normal device workflow. Load a sample Sprinter with three devices: iPhone complete, iPad Mini needs an update, Patient-Facing iPad needs a reset. Nothing here is connected to production systems.</p>
+          <p className="rounded-2xl bg-warning-soft p-3 text-sm font-bold text-warning-foreground">Loading sample data replaces whatever progress is currently saved in this browser.</p>
         </header>
 
         <div className="grid gap-3 sm:grid-cols-2">
-          <Button size="xl" onClick={() => progressActions.loadDemo()}>
+          <Button size="xl" onClick={() => request("load")}>
             Load sample devices <ArrowRight aria-hidden />
           </Button>
-          <Button size="xl" variant="outline" onClick={() => progressActions.resetAll()}>
+          <Button size="xl" variant="outline" onClick={() => request("clear")}>
             <RotateCcw aria-hidden /> Clear all progress
           </Button>
         </div>
+
+        <AlertDialog open={pending !== null} onOpenChange={(o) => !o && setPending(null)}>
+          <AlertDialogContent className="rounded-3xl">
+            <AlertDialogHeader>
+              <AlertDialogTitle>{pending === "load" ? "Replace saved progress with sample data?" : "Erase all saved progress?"}</AlertDialogTitle>
+              <AlertDialogDescription className="text-base">
+                {pending === "load"
+                  ? "This browser already has device progress saved. Loading the sample devices will replace it and it cannot be brought back."
+                  : "This will erase the saved progress for every device in this browser. It cannot be brought back."}
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Keep my progress</AlertDialogCancel>
+              <AlertDialogAction onClick={() => pending && run(pending)}>{pending === "load" ? "Replace with sample data" : "Erase everything"}</AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
 
         <section className="grid gap-4 sm:grid-cols-3">
           {deviceOrder.map((d, i) => (

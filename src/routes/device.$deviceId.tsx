@@ -1,12 +1,20 @@
 import { createFileRoute, notFound, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { z } from "zod";
 import { StepView } from "@/components/StepView";
 import { DeviceChooser } from "@/components/DeviceChooser";
 import { SiteHeader } from "@/components/SiteHeader";
 import { isDeviceId, workflows } from "@/content/workflows";
 import { progressActions, useProgress } from "@/lib/progress";
 
+/** `?step=N` mirrors the current step (1-based) so browser Back/Forward move between steps. Invalid values are ignored. */
+const searchSchema = z.object({ step: z.coerce.number().int().positive().optional() });
+
 export const Route = createFileRoute("/device/$deviceId")({
+  validateSearch: (s): { step?: number } => {
+    const r = searchSchema.safeParse(s);
+    return r.success && r.data.step !== undefined ? { step: r.data.step } : {};
+  },
   loader: ({ params }) => {
     if (!isDeviceId(params.deviceId)) throw notFound();
     return { name: workflows[params.deviceId].name, description: workflows[params.deviceId].description };
@@ -30,6 +38,7 @@ export const Route = createFileRoute("/device/$deviceId")({
 
 function DevicePage() {
   const { deviceId } = Route.useParams();
+  const search = Route.useSearch();
   const progress = useProgress();
   const navigate = useNavigate();
   const id = isDeviceId(deviceId) ? deviceId : "iphone";
@@ -52,5 +61,5 @@ function DevicePage() {
     );
   }
 
-  return <StepView workflow={workflow} progress={p} path={p.path} />;
+  return <StepView workflow={workflow} progress={p} path={p.path} urlStep={search.step} />;
 }

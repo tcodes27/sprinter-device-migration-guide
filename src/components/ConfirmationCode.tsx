@@ -22,9 +22,14 @@ export function CopyButton({ text, label }: { text: string; label: string }) {
     window.setTimeout(() => setCopied(false), 2000);
   };
   return (
-    <Button variant="outline" size="lg" onClick={copy} disabled={!text}>
-      {copied ? <Check aria-hidden /> : <Copy aria-hidden />} {copied ? "Copied" : label}
-    </Button>
+    <>
+      <Button variant="outline" size="lg" onClick={copy} disabled={!text}>
+        {copied ? <Check aria-hidden /> : <Copy aria-hidden />} {copied ? "Copied" : label}
+      </Button>
+      <span className="sr-only" role="status" aria-live="polite">
+        {copied ? "Copied to clipboard" : ""}
+      </span>
+    </>
   );
 }
 

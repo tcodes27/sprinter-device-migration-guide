@@ -33,5 +33,10 @@ export const versionCheck = {
 export const support = {
   demoBadge: "Demo / Prototype",
   demoNote: "This is a demonstration. No message is actually sent.",
-  followUpEmail: "We'll send you a follow-up email confirming that your devices are up to date.",
+  /** Shown on the "You're all set" page. This guide sends nothing on its own. */
+  followUpEmail: "Copy your completion summary below and paste it into your reply to Field Support. Nothing is sent automatically from this guide.",
+  /** Shown when local saving fails */
+  saveFailed: "We could not save your progress on this device. Do not leave or refresh this page until you finish, or your progress may be lost.",
+  /** Shown once when a saved record could not be read */
+  restoreFailed: "Some saved progress could not be restored. You may need to restart the affected device.",
 };

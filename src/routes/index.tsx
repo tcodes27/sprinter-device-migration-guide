@@ -9,6 +9,7 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { DeviceLauncher } from "@/components/DeviceLauncher";
 import { DeviceChooser } from "@/components/DeviceChooser";
 import { ProgressRing } from "@/components/ProgressRing";
+import { StorageNotice } from "@/components/StorageNotice";
 import { journey, whyMigration } from "@/content/shared";
 import { deviceOrder, workflows } from "@/content/workflows";
 import { deviceStatus, summary, totalSteps, useProgress } from "@/lib/progress";
@@ -66,6 +67,7 @@ function Index() {
     <div className="min-h-screen pb-28">
       <SiteHeader />
       <main className="mx-auto max-w-5xl space-y-8 px-4 pt-8">
+        <StorageNotice />
         <motion.section initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="grid items-center gap-4 sm:grid-cols-[minmax(0,1fr)_auto]">
           <div className="min-w-0">
             <p className="text-sm font-extrabold uppercase tracking-[0.18em] text-primary">Device migration</p>
@@ -175,7 +177,8 @@ function Index() {
         </div>
 
         <p className="text-center text-xs font-semibold text-muted-foreground">
-          <Link to="/demo" className="underline underline-offset-4">Demo mode</Link> for internal demonstration
+          Sprinter Health staff only:{" "}
+          <Link to="/demo" className="underline underline-offset-4">Internal demo mode</Link> (sample data, not part of your migration)
         </p>
       </main>
 

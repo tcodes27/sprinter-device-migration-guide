@@ -3,11 +3,12 @@ import { useNavigate } from "@tanstack/react-router";
 import { AnimatePresence, motion } from "motion/react";
 import { ArrowLeft, ArrowRight, Eraser, RefreshCw, ShieldAlert } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { HoldToConfirm } from "./HoldToConfirm";
 import { deviceChooser, pathChoice } from "@/content/shared";
 import { deviceOrder, workflows } from "@/content/workflows";
-import { progressActions } from "@/lib/progress";
+import { hasProgress, progressActions, useProgress } from "@/lib/progress";
 import { pathLabels, type DeviceId, type MigrationPath } from "@/lib/workflow-types";
 import { useSupport } from "@/lib/support";
 import { cn } from "@/lib/utils";
@@ -35,24 +36,41 @@ type Props = {
 export function DeviceChooser({ open, onOpenChange, device: preset = null, onCancel }: Props) {
   const navigate = useNavigate();
   const { open: openSupport } = useSupport();
+  const progress = useProgress();
   const [device, setDevice] = useState<DeviceId | null>(preset);
   const [stage, setStage] = useState<Stage>(preset ? "action" : "device");
+  /** A different path was chosen for a device that already has progress; waiting for an explicit decision. */
+  const [pendingPath, setPendingPath] = useState<MigrationPath | null>(null);
 
   useEffect(() => {
     if (open) {
       setDevice(preset);
       setStage(preset ? "action" : "device");
+      setPendingPath(null);
     }
   }, [open, preset]);
 
   const wf = device ? workflows[device] : null;
 
-  const go = (path: MigrationPath) => {
+  const leave = () => {
     if (!device) return;
-    progressActions.setPath(device, path);
     onOpenChange(false);
     navigate({ to: "/device/$deviceId", params: { deviceId: device } });
   };
+
+  const go = (path: MigrationPath) => {
+    if (!device) return;
+    const saved = progress[device];
+    // Never silently wipe progress: switching paths on a device with progress needs a confirmation first.
+    if (saved.path && saved.path !== path && hasProgress(saved)) {
+      setPendingPath(path);
+      return;
+    }
+    progressActions.setPath(device, path);
+    leave();
+  };
+
+  const currentPath = device ? progress[device].path : null;
 
   return (
     <Dialog
@@ -147,6 +165,39 @@ export function DeviceChooser({ open, onOpenChange, device: preset = null, onCan
             </motion.div>
           )}
         </AnimatePresence>
+
+        <AlertDialog open={pendingPath !== null} onOpenChange={(o) => !o && setPendingPath(null)}>
+          <AlertDialogContent className="rounded-3xl">
+            <AlertDialogHeader>
+              <AlertDialogTitle>Start over with a different path?</AlertDialogTitle>
+              <AlertDialogDescription className="text-base">
+                {wf?.name} already has progress saved for {currentPath ? pathLabels[currentPath] : "its current path"}. Changing to{" "}
+                {pendingPath ? pathLabels[pendingPath] : "the new path"} restarts this device from the beginning, and the progress and checkpoints for{" "}
+                {currentPath ? pathLabels[currentPath] : "the current path"} will be cleared. Other devices are not affected.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel
+                onClick={() => {
+                  setPendingPath(null);
+                  leave();
+                }}
+              >
+                Keep current path
+              </AlertDialogCancel>
+              <AlertDialogAction
+                onClick={() => {
+                  if (!device || !pendingPath) return;
+                  progressActions.setPath(device, pendingPath);
+                  setPendingPath(null);
+                  leave();
+                }}
+              >
+                Start over with {pendingPath ? pathLabels[pendingPath] : "new path"}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </DialogContent>
     </Dialog>
   );
