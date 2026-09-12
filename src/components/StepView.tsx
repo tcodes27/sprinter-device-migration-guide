@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Popover, PopoverClose, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { DeviceScreen } from "./DeviceScreen";
-import { DeviceSimulator, type SimPhase } from "./DeviceSimulator";
+import { DeviceSimulator } from "./DeviceSimulator";
 import { InstructionPanel } from "./InstructionPanel";
 import { StepShell } from "./StepShell";
 import { HoldToConfirm } from "./HoldToConfirm";
@@ -17,6 +17,7 @@ import { authErrorHelp, permissions, resetWarning, supportMessage, testflight, t
 import { phasesFor, stepsFor } from "@/content/workflows";
 import { pathLabels, type DeviceWorkflow, type MigrationPath, type WorkflowStep } from "@/lib/workflow-types";
 import { percent, progressActions, type DeviceProgress } from "@/lib/progress";
+import { checkpointsFor, firstIncomplete, isStepComplete } from "@/lib/checkpoints";
 import { useSupport, useSupportLocation } from "@/lib/support";
 import { cn } from "@/lib/utils";
 
@@ -288,37 +289,6 @@ function WhyPopover({ title, body, label = "Why?", icon = "why" }: { title: stri
         </PopoverClose>
       </PopoverContent>
     </Popover>
-  );
-}
-
-function TodoCheckItem({ label, number, checked, onToggle }: { label: string; number: number; checked: boolean; onToggle: () => void }) {
-  return (
-    <button
-      type="button"
-      role="checkbox"
-      aria-checked={checked}
-      onClick={onToggle}
-      className={cn(
-        "flex w-full items-start gap-3 rounded-2xl border px-3 py-2 text-left transition-colors",
-        checked ? "border-success/30 bg-success-soft/60" : "border-transparent hover:bg-muted/60",
-      )}
-    >
-      <span
-        className={cn(
-          "mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-xl border-2 text-base font-black transition-colors",
-          checked ? "border-success bg-success text-success-foreground" : "border-primary/30 bg-card text-primary",
-        )}
-      >
-        {checked ? (
-          <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-            <path d="M5 12.5l4.5 4.5L19 7" className="draw-check" />
-          </svg>
-        ) : (
-          number
-        )}
-      </span>
-      <span className={cn("pt-1 text-lg font-semibold", checked && "text-muted-foreground line-through decoration-success/60")}>{label}</span>
-    </button>
   );
 }
 
