@@ -13,8 +13,14 @@ type Props = {
   frame: "phone" | "tablet" | "tablet-wide";
   /** Change this to reset the simulator (e.g. step id) */
   resetKey: string;
-  /** Already finished earlier (restored from saved progress) */
-  initiallyDone?: boolean;
+  /**
+   * Screen the device should show, derived from saved checkpoints
+   * (the first task not yet done). Restored on load; when it changes from the
+   * outside (a box ticked by hand) the device jumps to that screen.
+   */
+  syncIndex?: number;
+  /** Fired when the Sprinter completes screen `i` (tap on the target, or a wait finished). */
+  onScreenPassed?: (i: number) => void;
   onComplete?: () => void;
   onProgress?: (index: number, phase: SimPhase) => void;
   large?: boolean;
@@ -25,18 +31,23 @@ type Props = {
  * Tap-along practice device. The Sprinter taps the glowing element to move
  * through the same screens they will see on their real device.
  */
-export function DeviceSimulator({ sequence, frame, resetKey, initiallyDone, onComplete, onProgress, large, hideControls }: Props) {
+export function DeviceSimulator({ sequence, frame, resetKey, syncIndex = 0, onScreenPassed, onComplete, onProgress, large, hideControls }: Props) {
   const reduce = useReducedMotion() ?? false;
   const last = sequence.length - 1;
-  const [idx, setIdx] = useState(initiallyDone ? last : 0);
-  const [phase, setPhase] = useState<SimPhase>(initiallyDone ? "done" : phaseFor(sequence[0]));
+  const start = Math.min(Math.max(0, syncIndex), last);
+  const [idx, setIdx] = useState(start);
+  const [phase, setPhase] = useState<SimPhase>(phaseFor(sequence[start]));
   const [dir, setDir] = useState(1);
   const [wrong, setWrong] = useState(0);
   const [coach, setCoach] = useState(false);
   const [autoplay, setAutoplay] = useState(false);
   const [pressing, setPressing] = useState(false);
   const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
-  const completedRef = useRef(initiallyDone ?? false);
+  const completedRef = useRef(start >= last);
+  const idxRef = useRef(start);
+  const syncRef = useRef(start);
+  idxRef.current = idx;
+  syncRef.current = start;
 
   const clearTimers = () => {
     timers.current.forEach(clearTimeout);
@@ -46,19 +57,6 @@ export function DeviceSimulator({ sequence, frame, resetKey, initiallyDone, onCo
     timers.current.push(setTimeout(fn, ms));
   };
 
-  // Reset when the step changes
-  useEffect(() => {
-    clearTimers();
-    completedRef.current = initiallyDone ?? false;
-    setIdx(initiallyDone ? last : 0);
-    setPhase(initiallyDone ? "done" : phaseFor(sequence[0]));
-    setAutoplay(false);
-    setPressing(false);
-    setCoach(false);
-    setDir(1);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [resetKey]);
-
   useEffect(() => () => clearTimers(), []);
 
   useEffect(() => {
@@ -67,25 +65,26 @@ export function DeviceSimulator({ sequence, frame, resetKey, initiallyDone, onCo
   }, [idx, phase]);
 
   const goTo = useCallback(
-    (next: number, isAuto: boolean) => {
+    (next: number, isAuto: boolean, direction = 1) => {
       const screen = sequence[next];
       if (!screen) return;
-      setDir(1);
+      setDir(direction);
       setIdx(next);
       setCoach(false);
       const p = phaseFor(screen);
       setPhase(p);
       if (p === "waiting" && screen.kind === "progress") {
-        later(() => goTo(next + 1, isAuto), reduce ? 700 : screen.durationMs);
+        later(() => {
+          if (!isAuto) onScreenPassed?.(next);
+          goTo(next + 1, isAuto);
+        }, reduce ? 700 : screen.durationMs);
       }
       if (p === "done") {
         if (isAuto) {
-          // Hand control back so the Sprinter can try it themselves
+          // Hand control back so the Sprinter can carry on where they were
           later(() => {
             setAutoplay(false);
-            setDir(-1);
-            setIdx(0);
-            setPhase(phaseFor(sequence[0]));
+            goTo(syncRef.current, false, -1);
           }, 1600);
         } else if (!completedRef.current) {
           completedRef.current = true;
@@ -94,8 +93,29 @@ export function DeviceSimulator({ sequence, frame, resetKey, initiallyDone, onCo
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [sequence, reduce, onComplete],
+    [sequence, reduce, onComplete, onScreenPassed],
   );
+
+  // Reset when the step changes: open on the saved position
+  useEffect(() => {
+    clearTimers();
+    completedRef.current = start >= last;
+    setAutoplay(false);
+    setPressing(false);
+    setWrong(0);
+    goTo(start, false, 1);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [resetKey]);
+
+  // Keep the device in step with the checklist (e.g. a box ticked or unticked by hand)
+  useEffect(() => {
+    if (autoplay) return;
+    if (start === idxRef.current) return;
+    clearTimers();
+    setPressing(false);
+    goTo(start, false, start > idxRef.current ? 1 : -1);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [start]);
 
   // Autoplay: press the target, then advance
   useEffect(() => {
@@ -111,6 +131,7 @@ export function DeviceSimulator({ sequence, frame, resetKey, initiallyDone, onCo
   const handleTap = (item: SimItem | null) => {
     if (autoplay || phase !== "ready") return;
     if (item?.target) {
+      onScreenPassed?.(idx);
       goTo(idx + 1, false);
     } else {
       setWrong((w) => w + 1);
@@ -122,18 +143,12 @@ export function DeviceSimulator({ sequence, frame, resetKey, initiallyDone, onCo
     clearTimers();
     setAutoplay(false);
     setPressing(false);
-    setDir(-1);
-    setIdx(0);
-    setPhase(phaseFor(sequence[0]));
-    setCoach(false);
+    goTo(0, false, -1);
   };
 
   const watch = () => {
     clearTimers();
-    setDir(-1);
-    setIdx(0);
-    setPhase(phaseFor(sequence[0]));
-    setCoach(false);
+    goTo(0, false, -1);
     setAutoplay(true);
   };
 
