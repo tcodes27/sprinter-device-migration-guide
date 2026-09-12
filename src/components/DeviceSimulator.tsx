@@ -183,7 +183,7 @@ export function DeviceSimulator({ sequence, frame, resetKey, initiallyDone, onCo
             <span className="h-1 w-16 rounded-full bg-foreground/25" />
           </div>
         </div>
-      </motion.div>
+      </div>
 
       <p className="min-h-6 text-center text-base font-extrabold text-primary" aria-live="polite">
         {phase === "done" ? "Now do the same on your real device." : screen.hint}
