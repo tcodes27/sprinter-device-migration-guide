@@ -424,7 +424,7 @@ function TestFlightPanel() {
       {/* Section 2 — after erase */}
       <div className="space-y-4">
         <div className="flex flex-wrap items-center gap-2">
-          <span className="rounded-full bg-purple-100 px-3 py-1 text-xs font-black uppercase tracking-wider text-purple-700">Section 2</span>
+          <span className="rounded-full bg-primary/15 px-3 py-1 text-xs font-black uppercase tracking-wider text-primary">Section 2</span>
           <span className="text-base font-extrabold">{testflightAfterErase.title}</span>
         </div>
         <p className="rounded-2xl bg-primary-soft p-4 text-base font-bold">{testflightAfterErase.intro}</p>
