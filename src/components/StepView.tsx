@@ -36,16 +36,20 @@ export function StepView({ workflow, progress, path }: Props) {
   const [different, setDifferent] = useState(false);
   const [lightbox, setLightbox] = useState(false);
   const [anotherOpen, setAnotherOpen] = useState(false);
-  const [sim, setSim] = useState<{ index: number; phase: SimPhase }>({ index: 0, phase: "ready" });
   const gateNeeded = !!step.resetGate && !progress.gates.includes(step.id);
   const isComplete = step.kind === "complete";
   const isVerify = step.kind === "verify-version";
-  const savedDone = progress.simDone.includes(index);
+
+  // Checkpoints: the saved, task-level state of this step
+  const checkpoints = checkpointsFor(step);
+  const done = progress.checkpoints?.[step.id] ?? [];
+  const current = firstIncomplete(checkpoints, done);
+  const stepDone = isStepComplete(checkpoints, done);
   const verified = progress.verified.includes(index);
-  const simDone = savedDone || sim.phase === "done" || !step.sequence;
+  const answer = progress.answers?.[step.id] ?? null;
   const canAdvance = isVerify ? verified : true;
   const isDone = progress.finished && index === total - 1;
-  const currentAction = step.sequence && !simDone && !gateNeeded ? step.sequence[Math.min(sim.index, step.sequence.length - 1)]?.hint : undefined;
+  const currentAction = !stepDone && !gateNeeded ? checkpoints[current]?.label : undefined;
 
   useSupportLocation({
     deviceId: workflow.id,
@@ -62,6 +66,8 @@ export function StepView({ workflow, progress, path }: Props) {
   const goBack = () => index > 0 && progressActions.goTo(workflow.id, index - 1);
   const goNext = () => {
     if (!canAdvance) return;
+    // Anything the app could not detect is confirmed by the Sprinter here, so a step is never complete with open tasks.
+    if (!stepDone) progressActions.confirmRemaining(workflow.id, step.id, checkpoints.length);
     progressActions.completeAndNext(workflow.id, index);
     if (index >= total - 1) setAnotherOpen(true);
   };
@@ -69,10 +75,8 @@ export function StepView({ workflow, progress, path }: Props) {
     const i = steps.findIndex((s) => s.id === "update");
     progressActions.goTo(workflow.id, Math.max(0, i));
   };
-  const stepChecks = progress.checks?.[step.id] ?? [];
-  const toggleCheck = useCallback((i: number) => progressActions.toggleCheck(workflow.id, step.id, i), [workflow.id, step.id]);
-  const onSimComplete = useCallback(() => progressActions.markSimDone(workflow.id, index), [workflow.id, index]);
-  const onSimProgress = useCallback((i: number, phase: SimPhase) => setSim({ index: i, phase }), []);
+  const toggleCheck = useCallback((i: number) => progressActions.toggleCheckpoint(workflow.id, step.id, i), [workflow.id, step.id]);
+  const onScreenPassed = useCallback((i: number) => progressActions.completeCheckpoint(workflow.id, step.id, i), [workflow.id, step.id]);
 
   if (gateNeeded) {
     return (
