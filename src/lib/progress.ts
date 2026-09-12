@@ -138,9 +138,14 @@ export const progressActions = {
       answers: { ...d.answers, [stepId]: "matches" },
     }));
   },
-  /** A "no match" or "don't know" answer is remembered but never ticks the checkpoint. */
-  setAnswer(device: DeviceId, stepId: string, answer: VerifyAnswer) {
-    update(device, (d) => ({ ...d, answers: { ...d.answers, [stepId]: answer } }));
+  /** A "no match" or "don't know" answer is remembered and clears any earlier match, so the step cannot falsely advance. */
+  setAnswer(device: DeviceId, index: number, stepId: string, answer: Exclude<VerifyAnswer, "matches">) {
+    update(device, (d) => ({
+      ...d,
+      answers: { ...d.answers, [stepId]: answer },
+      verified: d.verified.filter((i) => i !== index),
+      checkpoints: { ...d.checkpoints, [stepId]: (d.checkpoints[stepId] ?? []).filter((i) => i !== 0) },
+    }));
   },
   completeCheckpoint(device: DeviceId, stepId: string, item: number) {
     update(device, (d) => {
