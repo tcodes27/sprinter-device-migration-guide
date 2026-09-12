@@ -2,6 +2,7 @@ import { useSyncExternalStore } from "react";
 import type { DeviceId, MigrationPath } from "./workflow-types";
 import { deviceOrder, stepsFor, workflows } from "@/content/workflows";
 import { checkpointsFor } from "./checkpoints";
+import { deviceConfirmationCode } from "./confirmation";
 
 export type VerifyAnswer = "matches" | "noMatch" | "dontKnow";
 
@@ -18,13 +19,16 @@ export type DeviceProgress = {
   answers: Record<string, VerifyAnswer>;
   finished: boolean;
   started: boolean;
+  /** Issued once when the device is finished. Sent to Field Support in the ticket reply. */
+  confirmationCode: string | null;
+  completedAt: string | null;
 };
 
 export type ProgressState = Record<DeviceId, DeviceProgress>;
 
 const KEY = "sh-migration-progress-v3";
 
-const emptyDevice = (): DeviceProgress => ({ path: null, current: 0, completed: [], gates: [], verified: [], checkpoints: {}, answers: {}, finished: false, started: false });
+const emptyDevice = (): DeviceProgress => ({ path: null, current: 0, completed: [], gates: [], verified: [], checkpoints: {}, answers: {}, finished: false, started: false, confirmationCode: null, completedAt: null });
 const emptyState = (): ProgressState => ({ iphone: emptyDevice(), "ipad-mini": emptyDevice(), "patient-ipad": emptyDevice() });
 
 const SERVER_SNAPSHOT = emptyState();
