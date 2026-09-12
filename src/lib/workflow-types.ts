@@ -16,7 +16,12 @@ export type Screen =
   | { kind: "wait"; title: string; body?: string }
   | { kind: "home"; title: string; apps: string[] };
 
-export type StepKind = "instruction" | "waiting" | "complete";
+export type StepKind = "instruction" | "waiting" | "verify-version" | "complete";
+
+/** What the IT message asked the Sprinter to do. The app never decides this. */
+export type MigrationPath = "update" | "update-reset";
+
+export const pathLabels: Record<MigrationPath, string> = { update: "Update only", "update-reset": "Update + Reset" };
 
 /* ---------------- Tap-along simulator model ---------------- */
 
@@ -70,6 +75,10 @@ export type WorkflowStep = {
   extras?: ("testflight" | "permissions" | "authError")[];
   /** Optional step-specific troubleshooting answers */
   troubleshoot?: Partial<Record<TroubleChoice, string>>;
+  /** Which IT-requested paths include this step. Omitted = every path. */
+  paths?: MigrationPath[];
+  /** Short label used in the route overview (e.g. "Reset") */
+  phase?: string;
 };
 
 export type TroubleChoice = "noButton" | "error" | "stuck" | "dontKnow" | "other";
@@ -82,5 +91,7 @@ export type DeviceWorkflow = {
   startLabel: string;
   frame: "phone" | "tablet" | "tablet-wide";
   steps: WorkflowStep[];
-  completionChecklist: string[];
+  completionChecklist: Record<MigrationPath, string[]>;
+  /** Small always-visible information card (e.g. Patient-Facing device note) */
+  note?: { title: string; lines: string[] };
 };
