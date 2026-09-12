@@ -1,11 +1,14 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect } from "react";
 import { motion } from "motion/react";
 import { ArrowRight, Check, Headset, PartyPopper } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { CopyButton } from "@/components/ConfirmationCode";
 import { SiteHeader } from "@/components/SiteHeader";
 import { support as supportCopy } from "@/content/config";
 import { deviceOrder, workflows } from "@/content/workflows";
-import { summary, useProgress } from "@/lib/progress";
+import { progressActions, summary, useProgress } from "@/lib/progress";
+import { masterCodeFor, summaryText } from "@/lib/confirmation";
 import { useSupport, useSupportLocation } from "@/lib/support";
 import { pathLabels } from "@/lib/workflow-types";
 
@@ -27,7 +30,16 @@ function CompletePage() {
   const progress = useProgress();
   const { done, total, allDone } = summary(progress);
   const { open } = useSupport();
+  const masterCode = masterCodeFor(progress);
   useSupportLocation({ deviceName: "All devices", completed: true, percent: Math.round((done / total) * 100) });
+
+  // Older saves may be finished without a code yet; issue one.
+  useEffect(() => {
+    for (const d of deviceOrder) {
+      const p = progress[d];
+      if (p.finished && !p.confirmationCode) progressActions.ensureConfirmation(d);
+    }
+  }, [progress]);
 
   return (
     <div className="min-h-screen pb-28">
@@ -53,12 +65,33 @@ function CompletePage() {
                 <span>
                   {workflows[d].name}
                   {p.path && <span className="ml-2 text-sm font-semibold text-muted-foreground">{pathLabels[p.path]}</span>}
+                  {p.finished && p.confirmationCode && (
+                    <span className="block text-sm font-bold tracking-wider text-muted-foreground">
+                      {p.confirmationCode}
+                      {p.completedAt ? ` · ${new Date(p.completedAt).toLocaleDateString()}` : ""}
+                    </span>
+                  )}
                 </span>
                 {p.finished ? <span className="flex items-center gap-1 text-success"><Check className="h-5 w-5" aria-hidden /> Complete</span> : <span className="text-muted-foreground">{p.path ? "In progress" : "Not started"}</span>}
               </li>
             );
           })}
         </ul>
+
+        {masterCode && (
+          <div className="card-soft space-y-3 border-success/40 p-5 text-left" aria-label="Completion code">
+            <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-success">All devices finished</p>
+            <p className="text-xl font-black">Your completion code</p>
+            <div className="flex flex-wrap items-center gap-3">
+              <code className="rounded-xl bg-success-soft px-4 py-2 text-2xl font-black tracking-widest">{masterCode}</code>
+              <CopyButton text={summaryText(progress)} label="Copy completion summary" />
+            </div>
+            <p className="text-base font-semibold text-muted-foreground">
+              Send this code in your reply to Field Support. They will confirm everything is recorded and close your
+              ticket.
+            </p>
+          </div>
+        )}
 
         <div className="rounded-2xl bg-primary-soft p-4 text-left">
           <p className="text-base font-extrabold">If anything seems off, we're still here.</p>

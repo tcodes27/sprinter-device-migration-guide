@@ -2,6 +2,7 @@ import { useSyncExternalStore } from "react";
 import type { DeviceId, MigrationPath } from "./workflow-types";
 import { deviceOrder, stepsFor, workflows } from "@/content/workflows";
 import { checkpointsFor } from "./checkpoints";
+import { deviceConfirmationCode } from "./confirmation";
 
 export type VerifyAnswer = "matches" | "noMatch" | "dontKnow";
 
@@ -18,13 +19,16 @@ export type DeviceProgress = {
   answers: Record<string, VerifyAnswer>;
   finished: boolean;
   started: boolean;
+  /** Issued once when the device is finished. Sent to Field Support in the ticket reply. */
+  confirmationCode: string | null;
+  completedAt: string | null;
 };
 
 export type ProgressState = Record<DeviceId, DeviceProgress>;
 
 const KEY = "sh-migration-progress-v3";
 
-const emptyDevice = (): DeviceProgress => ({ path: null, current: 0, completed: [], gates: [], verified: [], checkpoints: {}, answers: {}, finished: false, started: false });
+const emptyDevice = (): DeviceProgress => ({ path: null, current: 0, completed: [], gates: [], verified: [], checkpoints: {}, answers: {}, finished: false, started: false, confirmationCode: null, completedAt: null });
 const emptyState = (): ProgressState => ({ iphone: emptyDevice(), "ipad-mini": emptyDevice(), "patient-ipad": emptyDevice() });
 
 const SERVER_SNAPSHOT = emptyState();
@@ -44,6 +48,8 @@ function normalize(raw: Partial<Record<DeviceId, LegacyDevice>>): ProgressState 
     if (!Array.isArray(p.completed)) p.completed = [];
     if (!p.checkpoints || typeof p.checkpoints !== "object" || Array.isArray(p.checkpoints)) p.checkpoints = {};
     if (!p.answers || typeof p.answers !== "object" || Array.isArray(p.answers)) p.answers = {};
+    if (typeof p.confirmationCode !== "string") p.confirmationCode = null;
+    if (typeof p.completedAt !== "string") p.completedAt = null;
     // Migrate older saves: hand-ticked boxes and finished practice devices become checkpoints.
     if (checks && typeof checks === "object") {
       for (const [id, list] of Object.entries(checks)) if (Array.isArray(list)) p.checkpoints[id] = union(p.checkpoints[id] ?? [], list);
@@ -126,8 +132,25 @@ export const progressActions = {
       const total = totalSteps(device, d);
       const completed = d.completed.includes(index) ? d.completed : [...d.completed, index];
       const isLast = index >= total - 1;
-      return { ...d, started: true, completed, current: isLast ? index : index + 1, finished: isLast || d.finished };
+      const nowFinished = isLast || d.finished;
+      return {
+        ...d,
+        started: true,
+        completed,
+        current: isLast ? index : index + 1,
+        finished: nowFinished,
+        confirmationCode: nowFinished ? (d.confirmationCode ?? deviceConfirmationCode(device)) : d.confirmationCode,
+        completedAt: nowFinished ? (d.completedAt ?? new Date().toISOString()) : d.completedAt,
+      };
     });
+  },
+  /** Issues a confirmation code for a finished device that predates codes (older saves, demo data). */
+  ensureConfirmation(device: DeviceId) {
+    update(device, (d) =>
+      d.finished && !d.confirmationCode
+        ? { ...d, confirmationCode: deviceConfirmationCode(device), completedAt: d.completedAt ?? new Date().toISOString() }
+        : d,
+    );
   },
   /** A version match: remembers the answer, ticks the decision checkpoint and unlocks the step. */
   markVerified(device: DeviceId, index: number, stepId: string) {
@@ -185,7 +208,7 @@ export const progressActions = {
     const total = iphoneSteps.length;
     const all = Array.from({ length: total }, (_, i) => i);
     const allDone = (steps: typeof iphoneSteps, upTo: number) => Object.fromEntries(steps.slice(0, upTo).map((st) => [st.id, checkpointsFor(st).map((c) => c.id)]));
-    s.iphone = { path: "update-reset", current: total - 1, completed: all, verified: [1], checkpoints: allDone(iphoneSteps, total), answers: { [iphoneSteps[1]!.id]: "matches" }, gates: ["reset"], finished: true, started: true };
+    s.iphone = { path: "update-reset", current: total - 1, completed: all, verified: [1], checkpoints: allDone(iphoneSteps, total), answers: { [iphoneSteps[1]!.id]: "matches" }, gates: ["reset"], finished: true, started: true, confirmationCode: deviceConfirmationCode("iphone"), completedAt: new Date().toISOString() };
     s["ipad-mini"] = { ...emptyDevice(), path: "update", started: true };
     const patientSteps = stepsFor(workflows["patient-ipad"], "update-reset");
     s["patient-ipad"] = { ...emptyDevice(), path: "update-reset", current: 1, completed: [0], checkpoints: allDone(patientSteps, 1), started: true };
