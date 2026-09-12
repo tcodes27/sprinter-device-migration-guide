@@ -310,7 +310,11 @@ export function StepView({ workflow, progress, path }: Props) {
                 : "I did all of this on my real device"}
           </span>
           <span className="sm:hidden">
-            {isDone ? "Finish device" : stepDone || isVerify || isComplete ? step.nextLabel : "Done with this step"}
+            {isDone
+              ? "Finish device"
+              : stepDone || isVerify || isComplete
+                ? step.nextLabel
+                : "Done with this step"}
           </span>
           <ArrowRight aria-hidden />
         </Button>
@@ -327,12 +331,7 @@ export function StepView({ workflow, progress, path }: Props) {
           </span>
         )}
       </div>
-      <Button
-        asChild
-        variant="ghost"
-        size="lg"
-        className="max-sm:h-11 max-sm:w-11 max-sm:px-0"
-      >
+      <Button asChild variant="ghost" size="lg" className="max-sm:h-11 max-sm:w-11 max-sm:px-0">
         <Link to="/" aria-label="Pause, progress saved">
           <PauseCircle aria-hidden />{" "}
           <span className="hidden sm:inline">

@@ -22,9 +22,23 @@ type Props = {
 };
 
 /** Split layout: sticky "you are here" on top, practice device left / instructions right, sticky actions at the bottom. */
-export function StepShell({ deviceName, pathLabel, phases, currentPhase, index, total, completed, left, right, bottom, children }: Props) {
+export function StepShell({
+  deviceName,
+  pathLabel,
+  phases,
+  currentPhase,
+  index,
+  total,
+  completed,
+  left,
+  right,
+  bottom,
+  children,
+}: Props) {
   const [demoOpen, setDemoOpen] = useState(false);
-  const phaseIdx = phases.findIndex((p, i) => p === currentPhase && (i === phases.length - 1 || p !== phases[i + 1] || true));
+  const phaseIdx = phases.findIndex(
+    (p, i) => p === currentPhase && (i === phases.length - 1 || p !== phases[i + 1] || true),
+  );
   // Highlight the *current* occurrence of a repeated phase (e.g. two "Verify") by walking with the step index.
   const current = currentPhaseIndex(phases, currentPhase, index, total, phaseIdx);
 
@@ -55,7 +69,10 @@ export function StepShell({ deviceName, pathLabel, phases, currentPhase, index, 
             <span className="flex items-center gap-1 rounded-full bg-primary-soft px-3 py-1 text-sm font-extrabold text-primary">
               <MapPin className="h-3.5 w-3.5" aria-hidden /> Step {index + 1} of {total}
             </span>
-            <Link to="/" className="hidden rounded-xl px-3 py-1.5 text-sm font-bold text-muted-foreground hover:bg-muted sm:inline">
+            <Link
+              to="/"
+              className="hidden rounded-xl px-3 py-1.5 text-sm font-bold text-muted-foreground hover:bg-muted sm:inline"
+            >
               Devices
             </Link>
           </div>
@@ -64,8 +81,21 @@ export function StepShell({ deviceName, pathLabel, phases, currentPhase, index, 
           <ol className="flex flex-wrap items-center gap-1" aria-label="Route overview">
             {phases.map((p, i) => (
               <li key={`${p}-${i}`} className="flex items-center gap-1">
-                <span className={cn("rounded-full px-2 py-0.5 text-[11px] font-extrabold uppercase tracking-wide", i < current ? "bg-success-soft text-success" : i === current ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground")}>{p}</span>
-                {i < phases.length - 1 && <ChevronRight className="h-3 w-3 text-muted-foreground" aria-hidden />}
+                <span
+                  className={cn(
+                    "rounded-full px-2 py-0.5 text-[11px] font-extrabold uppercase tracking-wide",
+                    i < current
+                      ? "bg-success-soft text-success"
+                      : i === current
+                        ? "bg-primary text-primary-foreground"
+                        : "bg-muted text-muted-foreground",
+                  )}
+                >
+                  {p}
+                </span>
+                {i < phases.length - 1 && (
+                  <ChevronRight className="h-3 w-3 text-muted-foreground" aria-hidden />
+                )}
               </li>
             ))}
           </ol>
@@ -84,9 +114,14 @@ export function StepShell({ deviceName, pathLabel, phases, currentPhase, index, 
           >
             <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between gap-3 px-4 py-3 text-base font-extrabold text-primary marker:content-none lg:hidden">
               <span>See a practice demo</span>
-              <ChevronDown className="h-5 w-5 shrink-0 transition-transform group-open:rotate-180" aria-hidden />
+              <ChevronDown
+                className="h-5 w-5 shrink-0 transition-transform group-open:rotate-180"
+                aria-hidden
+              />
             </summary>
-            <div className="border-t p-4 group-open:block lg:block lg:border-t-0 lg:p-5">{left}</div>
+            <div className="border-t p-4 group-open:block lg:block lg:border-t-0 lg:p-5">
+              {left}
+            </div>
           </details>
         </section>
         <section aria-label="Instructions" className="min-w-0">
@@ -106,7 +141,13 @@ export function StepShell({ deviceName, pathLabel, phases, currentPhase, index, 
  * Phases can repeat (Verify after update, Verify at the end). Pick the occurrence
  * that matches where the Sprinter is: before the halfway mark → first, else → last.
  */
-function currentPhaseIndex(phases: string[], phase: string, index: number, total: number, first: number) {
+function currentPhaseIndex(
+  phases: string[],
+  phase: string,
+  index: number,
+  total: number,
+  first: number,
+) {
   const occurrences = phases.map((p, i) => (p === phase ? i : -1)).filter((i) => i >= 0);
   if (occurrences.length <= 1) return first;
   return index >= total - 2 ? occurrences[occurrences.length - 1]! : occurrences[0]!;

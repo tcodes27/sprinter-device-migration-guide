@@ -3,7 +3,12 @@ import { LifeBuoy, Smartphone } from "lucide-react";
 import { Logo } from "./Logo";
 
 const nav = [
-  { to: "/", label: "Devices", ariaLabel: "Devices, return to the main device screen", icon: Smartphone },
+  {
+    to: "/",
+    label: "Devices",
+    ariaLabel: "Devices, return to the main device screen",
+    icon: Smartphone,
+  },
   { to: "/help", label: "Help", ariaLabel: "Help and Field Support", icon: LifeBuoy },
 ] as const;
 
