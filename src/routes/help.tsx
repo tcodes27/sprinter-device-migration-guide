@@ -11,10 +11,10 @@ export const Route = createFileRoute("/help")({
   validateSearch: (s) => searchSchema.parse(s),
   head: () => ({
     meta: [
-      { title: "Need Help? — Sprinter Health Device Migration" },
+      { title: "Need Help?. Sprinter Health Device Migration" },
       { name: "description", content: "When to stop and contact Field Support, why the migration is happening, and how to tell IT about a device problem." },
-      { property: "og:title", content: "Need Help? — Sprinter Health Device Migration" },
-      { property: "og:description", content: "Stop, don't guess — contact Field Support." },
+      { property: "og:title", content: "Need Help?. Sprinter Health Device Migration" },
+      { property: "og:description", content: "Stop, don't guess, contact Field Support." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],

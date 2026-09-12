@@ -32,8 +32,8 @@ export const resetWarning = {
   next: "Now we'll erase and reset it.",
   body: "This process will erase the device and require you to set it up again. Make sure this matches the instructions you received from Sprinter Health IT.",
   unsure: "Do not continue if you are unsure.",
-  confirm: "Yes — continue",
-  back: "No — go back",
+  confirm: "Yes, continue",
+  back: "No, go back",
   help: "I need help",
 };
 
@@ -47,7 +47,7 @@ export const pathChoice = {
     title: "You selected Update + Reset.",
     body: "Make sure this matches the instructions you received from Sprinter Health IT.",
     warning: "This process will erase the device and require you to set it up again.",
-    yes: "Yes — this is what IT said",
+    yes: "Yes, this is what IT said",
     back: "Go back",
   },
 };
@@ -82,7 +82,7 @@ export const defaultTroubleAnswers: Record<TroubleChoice, string> = {
   error:
     "Don't tap random options. Take a screenshot of the error if you can. Then contact Field Support so we can help.",
   stuck:
-    "Wait two full minutes — some steps take longer than they look. Keep the device plugged in. If nothing changes, contact Field Support.",
+    "Wait two full minutes, some steps take longer than they look. Keep the device plugged in. If nothing changes, contact Field Support.",
   dontKnow: "That's okay. Re-read the \"What to do\" list one line at a time. If you're still unsure, contact Field Support. Do not guess.",
   other: "Stop here and contact Field Support. A screenshot of your screen helps us fix it faster.",
 };

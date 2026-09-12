@@ -16,7 +16,7 @@ type Props = {
   onShowMe: () => void;
 };
 
-/** "Update complete?" — the Sprinter confirms the version. The app never assumes the update worked. */
+/** "Update complete?", the Sprinter confirms the version. The app never assumes the update worked. */
 export function VersionCheck({ deviceName, verified, onVerified, onBackToUpdate, onShowMe }: Props) {
   const [answer, setAnswer] = useState<Answer>(verified ? "matches" : null);
   const { open } = useSupport();
@@ -51,7 +51,7 @@ export function VersionCheck({ deviceName, verified, onVerified, onBackToUpdate,
             <span className="flex h-9 w-9 items-center justify-center rounded-full bg-success text-success-foreground">
               <Check className="h-5 w-5" aria-hidden />
             </span>
-            <p className="text-base font-extrabold">Great — your {deviceName} is updated. Use the button below to continue.</p>
+            <p className="text-base font-extrabold">Great, your {deviceName} is updated. Use the button below to continue.</p>
           </motion.div>
         )}
         {answer === "noMatch" && (

@@ -146,12 +146,12 @@ export function DeviceSimulator({ sequence, frame, resetKey, initiallyDone, onCo
       <div className="flex items-center gap-2 text-xs font-extrabold uppercase tracking-[0.18em] text-muted-foreground" aria-live="polite">
         {phase === "done" ? (
           <span className="flex items-center gap-1.5 rounded-full bg-success-soft px-3 py-1 text-success normal-case tracking-normal">
-            <Check className="h-4 w-4" aria-hidden /> Nice — you did it
+            <Check className="h-4 w-4" aria-hidden /> Nice, you did it
           </span>
         ) : autoplay ? (
           <span className="rounded-full bg-primary-soft px-3 py-1 text-primary normal-case tracking-normal">Watch the glowing spot…</span>
         ) : phase === "waiting" ? (
-          <span className="rounded-full bg-primary-soft px-3 py-1 text-primary normal-case tracking-normal">Waiting — this is normal</span>
+          <span className="rounded-full bg-primary-soft px-3 py-1 text-primary normal-case tracking-normal">Waiting, this is normal</span>
         ) : (
           <span>Practice device · tap the glowing spot</span>
         )}

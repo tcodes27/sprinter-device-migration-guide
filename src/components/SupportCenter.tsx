@@ -21,7 +21,7 @@ export function SupportCenter() {
     after: "What is happening?",
     chat: "Field Support",
     request: "Your support request is ready.",
-    stop: "Stop — let's get help",
+    stop: "Stop, let's get help",
     sent: "Support request created",
   };
 
@@ -125,7 +125,7 @@ function LocationCard({ location, compact = false }: { location: SupportLocation
       <dl className={cn("mt-2 grid gap-x-4 gap-y-1 text-base", compact ? "grid-cols-1" : "grid-cols-[auto_1fr]")}>
         <Row k="Device" v={location.deviceName} />
         {location.processLabel && <Row k="Process" v={location.processLabel} />}
-        {location.stepNumber && location.stepTotal && <Row k="Step" v={`${location.stepNumber} of ${location.stepTotal}${location.stepTitle ? ` — ${location.stepTitle}` : ""}`} />}
+        {location.stepNumber && location.stepTotal && <Row k="Step" v={`${location.stepNumber} of ${location.stepTotal}${location.stepTitle ? `, ${location.stepTitle}` : ""}`} />}
         {location.currentAction && <Row k="Action" v={location.currentAction} />}
         {typeof location.percent === "number" && <Row k="Progress" v={`${location.percent}% complete`} />}
       </dl>
@@ -188,13 +188,13 @@ type Msg = { from: "support" | "me"; text: string };
 
 const quick: { label: string; reply: string }[] = [
   { label: "I don't understand this step", reply: "No problem. Read the “What to do” list one line at a time and do only that line. Tap “Why?” if you want to know the reason. Want me to open a request so a person can walk you through it?" },
-  { label: "My screen looks different", reply: "That happens — devices can show slightly different screens. Look for the words in bold on the practice device. If you can't find them within a minute, stop and I'll get a person on it." },
-  { label: "My device is stuck", reply: "Give it two full minutes and keep it plugged in — some steps take longer than they look and the device is not frozen. If nothing changes after that, don't restart it. Request Field Support and we'll take over." },
-  { label: "Something else", reply: "Okay. The fastest way is to send a request — I've already noted your device and step, so you only need to add a sentence about what's happening." },
+  { label: "My screen looks different", reply: "That happens, devices can show slightly different screens. Look for the words in bold on the practice device. If you can't find them within a minute, stop and I'll get a person on it." },
+  { label: "My device is stuck", reply: "Give it two full minutes and keep it plugged in, some steps take longer than they look and the device is not frozen. If nothing changes after that, don't restart it. Request Field Support and we'll take over." },
+  { label: "Something else", reply: "Okay. The fastest way is to send a request. I've already noted your device and step, so you only need to add a sentence about what's happening." },
 ];
 
 function ChatView({ location, onRequest, onClose }: { location: SupportLocation | null; onRequest: (issue: string) => void; onClose: () => void }) {
-  const where = location?.stepNumber ? `You're on step ${location.stepNumber} of ${location.stepTotal} — ${location.stepTitle}.` : location ? `You're working on your ${location.deviceName}.` : "You're on the device migration home screen.";
+  const where = location?.stepNumber ? `You're on step ${location.stepNumber} of ${location.stepTotal}, ${location.stepTitle}.` : location ? `You're working on your ${location.deviceName}.` : "You're on the device migration home screen.";
   const [msgs, setMsgs] = useState<Msg[]>([
     { from: "support", text: "Hi! I'm here to help. 👋" },
     { from: "support", text: `${where} What's happening?` },
@@ -251,7 +251,7 @@ function ChatView({ location, onRequest, onClose }: { location: SupportLocation 
         onSubmit={(e) => {
           e.preventDefault();
           if (!draft.trim()) return;
-          send(draft.trim(), "Thanks — I've noted that. If you'd like a person to take it from here, tap “Request Field Support” and I'll include what you wrote.");
+          send(draft.trim(), "Thanks. I've noted that. If you'd like a person to take it from here, tap “Request Field Support” and I'll include what you wrote.");
           setDraft("");
         }}
       >
@@ -278,7 +278,7 @@ function RequestView({ location, issue, onIssue, onSend, onBack }: { location: S
   const [message, setMessage] = useState("");
   const [showMsg, setShowMsg] = useState(false);
   const [shot, setShot] = useState(false);
-  const stepText = location?.stepNumber ? `Step ${location.stepNumber} of ${location.stepTotal}${location.stepTitle ? ` — ${location.stepTitle}` : ""}` : location?.completed ? "Migration complete" : "Home";
+  const stepText = location?.stepNumber ? `Step ${location.stepNumber} of ${location.stepTotal}${location.stepTitle ? `, ${location.stepTitle}` : ""}` : location?.completed ? "Migration complete" : "Home";
 
   return (
     <div className="space-y-4">
@@ -350,7 +350,7 @@ function SentView({ onClose }: { onClose: () => void }) {
       </motion.span>
       <div className="rounded-2xl bg-primary-soft p-4 text-left text-base font-semibold">
         <p className="font-extrabold">What happens next</p>
-        <p className="mt-1">Field Support sees your device, step, and issue. They'll reach out to you — you don't need to do anything else right now.</p>
+        <p className="mt-1">Field Support sees your device, step, and issue. They'll reach out to you, you don't need to do anything else right now.</p>
       </div>
       <Button size="xl" className="w-full" onClick={onClose}>
         Return to my guide

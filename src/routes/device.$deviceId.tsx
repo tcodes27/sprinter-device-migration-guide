@@ -15,9 +15,9 @@ export const Route = createFileRoute("/device/$deviceId")({
     const name = loaderData?.name ?? "Device";
     return {
       meta: [
-        { title: `${name} Migration Steps — Sprinter Health` },
+        { title: `${name} Migration Steps. Sprinter Health` },
         { name: "description", content: `Tap-along guided steps to update, reset, and set up your Sprinter Health ${name}.` },
-        { property: "og:title", content: `${name} Migration Steps — Sprinter Health` },
+        { property: "og:title", content: `${name} Migration Steps. Sprinter Health` },
         { property: "og:description", content: loaderData?.description ?? "Guided device migration steps." },
         { property: "og:type", content: "website" },
         { name: "twitter:card", content: "summary" },

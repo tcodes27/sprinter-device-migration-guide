@@ -53,7 +53,7 @@ export function HoldToConfirm({ label, holdMs = 1200, onConfirm, className }: Pr
       onKeyUp={(e) => {
         if (e.key === " " || e.key === "Enter") stop();
       }}
-      aria-label={`${label} — press and hold`}
+      aria-label={`${label}, press and hold`}
       className={cn(
         "relative min-h-16 w-full select-none overflow-hidden rounded-2xl bg-warning-soft text-lg font-extrabold text-warning-foreground shadow-soft ring-2 ring-warning/60 transition-transform active:scale-[0.99] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring/40",
         done && "bg-success text-success-foreground ring-success",

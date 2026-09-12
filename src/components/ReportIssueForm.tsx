@@ -44,7 +44,7 @@ export function ReportIssueForm({ issueType, defaultDevice }: Props) {
       </div>
 
       <fieldset className="space-y-2">
-        <legend className="text-sm font-extrabold uppercase tracking-wide text-muted-foreground">Device — which device are you using?</legend>
+        <legend className="text-sm font-extrabold uppercase tracking-wide text-muted-foreground">Device, which device are you using?</legend>
         <div className="grid gap-2 sm:grid-cols-3">
           {deviceOrder.map((d) => (
             <Button key={d} type="button" variant={device === d ? "default" : "outline"} size="lg" onClick={() => setDevice(d)} aria-pressed={device === d}>
@@ -56,7 +56,7 @@ export function ReportIssueForm({ issueType, defaultDevice }: Props) {
 
       <div className="space-y-2">
         <Label htmlFor="problem" className="text-sm font-extrabold uppercase tracking-wide text-muted-foreground">
-          Problem — what is happening?
+          Problem, what is happening?
         </Label>
         <Textarea id="problem" required rows={4} className="rounded-xl text-base" placeholder="Example: The app won't open after I tap it." />
       </div>
@@ -91,7 +91,7 @@ export function ReportIssueForm({ issueType, defaultDevice }: Props) {
 
       <div className="space-y-2">
         <Label htmlFor="photo" className="text-sm font-extrabold uppercase tracking-wide text-muted-foreground">
-          Photo — attach a screenshot if useful (optional)
+          Photo, attach a screenshot if useful (optional)
         </Label>
         <label htmlFor="photo" className="flex min-h-14 cursor-pointer items-center gap-3 rounded-xl border-2 border-dashed border-primary/30 bg-primary-soft/50 px-4 text-base font-bold text-primary">
           <Paperclip aria-hidden /> Choose a photo

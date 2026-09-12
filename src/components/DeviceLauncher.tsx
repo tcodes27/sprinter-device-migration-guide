@@ -61,7 +61,7 @@ export function DeviceLauncher({ id, progress, index = 0, onSelect }: Props) {
             status === "complete" ? "bg-card text-success" : status === "in-progress" ? "bg-primary text-primary-foreground" : "bg-primary-soft text-primary group-hover:bg-primary group-hover:text-primary-foreground",
           )}
         >
-          {status === "complete" ? "Done — review" : status === "in-progress" ? `Continue · step ${stepNo} of ${total}` : "Start"}
+          {status === "complete" ? "Done, review" : status === "in-progress" ? `Continue · step ${stepNo} of ${total}` : "Start"}
           <ArrowRight className="h-4 w-4" aria-hidden />
         </span>
       </button>

@@ -55,7 +55,7 @@ export type WorkflowStep = {
   title: string;
   /** One calm sentence of context */
   intro: string;
-  /** What to do — short numbered actions (fallback when no sequence) */
+  /** What to do, short numbered actions (fallback when no sequence) */
   todo?: string[];
   /** Tap-along sequence played on the practice device */
   sequence?: SimScreen[];

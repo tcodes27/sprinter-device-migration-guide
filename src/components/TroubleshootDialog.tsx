@@ -14,7 +14,7 @@ type Props = {
   answers?: Partial<Record<TroubleChoice, string>> | undefined;
 };
 
-export function TroubleshootDialog({ open, onOpenChange, title = "That's okay — let's figure it out.", question = "What looks different?", answers }: Props) {
+export function TroubleshootDialog({ open, onOpenChange, title = "That's okay, let's figure it out.", question = "What looks different?", answers }: Props) {
   const [choice, setChoice] = useState<TroubleChoice | null>(null);
   const { open: openSupport } = useSupport();
   const merged = { ...defaultTroubleAnswers, ...answers };

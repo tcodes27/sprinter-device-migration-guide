@@ -12,9 +12,9 @@ import { pathLabels } from "@/lib/workflow-types";
 export const Route = createFileRoute("/complete")({
   head: () => ({
     meta: [
-      { title: "You're All Set — Sprinter Health Device Migration" },
+      { title: "You're All Set. Sprinter Health Device Migration" },
       { name: "description", content: "Your Sprinter Health devices are migrated. What to expect next and how to reach Field Support if anything comes up." },
-      { property: "og:title", content: "You're All Set — Sprinter Health Device Migration" },
+      { property: "og:title", content: "You're All Set. Sprinter Health Device Migration" },
       { property: "og:description", content: "Device migration complete." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -62,7 +62,7 @@ function CompletePage() {
 
         <div className="rounded-2xl bg-primary-soft p-4 text-left">
           <p className="text-base font-extrabold">If anything seems off, we're still here.</p>
-          <p className="text-sm font-semibold text-muted-foreground">Field Support can help after the migration too — you never have to guess.</p>
+          <p className="text-sm font-semibold text-muted-foreground">Field Support can help after the migration too, you never have to guess.</p>
         </div>
 
         <div className="grid gap-3 sm:grid-cols-2">

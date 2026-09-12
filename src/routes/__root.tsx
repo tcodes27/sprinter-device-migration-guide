@@ -122,7 +122,7 @@ function RootComponent() {
       <SupportProvider>
         {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
         <Outlet />
-        {/* Field Support is reachable from every screen — the Sprinter is never alone. */}
+        {/* Field Support is reachable from every screen, the Sprinter is never alone. */}
         <SupportCenter />
       </SupportProvider>
     </QueryClientProvider>
