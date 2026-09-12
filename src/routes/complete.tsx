@@ -30,7 +30,16 @@ function CompletePage() {
   const progress = useProgress();
   const { done, total, allDone } = summary(progress);
   const { open } = useSupport();
+  const masterCode = masterCodeFor(progress);
   useSupportLocation({ deviceName: "All devices", completed: true, percent: Math.round((done / total) * 100) });
+
+  // Older saves may be finished without a code yet; issue one.
+  useEffect(() => {
+    for (const d of deviceOrder) {
+      const p = progress[d];
+      if (p.finished && !p.confirmationCode) progressActions.ensureConfirmation(d);
+    }
+  }, [progress]);
 
   return (
     <div className="min-h-screen pb-28">
@@ -56,6 +65,12 @@ function CompletePage() {
                 <span>
                   {workflows[d].name}
                   {p.path && <span className="ml-2 text-sm font-semibold text-muted-foreground">{pathLabels[p.path]}</span>}
+                  {p.finished && p.confirmationCode && (
+                    <span className="block text-sm font-bold tracking-wider text-muted-foreground">
+                      {p.confirmationCode}
+                      {p.completedAt ? ` · ${new Date(p.completedAt).toLocaleDateString()}` : ""}
+                    </span>
+                  )}
                 </span>
                 {p.finished ? <span className="flex items-center gap-1 text-success"><Check className="h-5 w-5" aria-hidden /> Complete</span> : <span className="text-muted-foreground">{p.path ? "In progress" : "Not started"}</span>}
               </li>
