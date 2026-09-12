@@ -2,7 +2,7 @@ import { Check, ChevronRight, Wifi } from "lucide-react";
 import type { Screen } from "@/lib/workflow-types";
 import { cn } from "@/lib/utils";
 
-type Props = { screen: Screen; frame: "phone" | "tablet" | "tablet-wide"; lookFor?: string; large?: boolean };
+type Props = { screen: Screen; frame: "phone" | "tablet" | "tablet-wide"; lookFor?: string | undefined; large?: boolean | undefined };
 
 /**
  * Illustrated example of a device screen, driven by content.
