@@ -31,3 +31,10 @@
 - [x] Remove optional Why and What happens next controls
 - [x] Prevent Help and workflow actions from overlapping
 - [x] Verify mobile and desktop layouts and interactions
+
+## Dismissible floating Help control
+
+- [x] Align and tighten the floating Help control across screen sizes
+- [x] Add a separate accessible dismiss action
+- [x] Restore the floating control after page navigation
+- [x] Verify dismissal, navigation reset, and responsive presentation
