@@ -1,9 +1,28 @@
 import { useCallback, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
-import { ArrowLeft, ArrowRight, Check, CircleHelp, Expand, Headset, Info, OctagonAlert, PauseCircle, ShieldAlert, Sparkles, TriangleAlert } from "lucide-react";
+import {
+  ArrowLeft,
+  ArrowRight,
+  Check,
+  CircleHelp,
+  Expand,
+  Headset,
+  Info,
+  OctagonAlert,
+  PauseCircle,
+  ShieldAlert,
+  Sparkles,
+  TriangleAlert,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Popover, PopoverClose, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { DeviceScreen } from "./DeviceScreen";
 import { DeviceSimulator } from "./DeviceSimulator";
@@ -13,9 +32,21 @@ import { HoldToConfirm } from "./HoldToConfirm";
 import { TroubleshootDialog } from "./TroubleshootDialog";
 import { VersionCheck } from "./VersionCheck";
 import { Logo } from "./Logo";
-import { authErrorHelp, permissions, resetWarning, supportMessage, testflight, testflightAfterErase } from "@/content/shared";
+import {
+  authErrorHelp,
+  permissions,
+  resetWarning,
+  supportMessage,
+  testflight,
+  testflightAfterErase,
+} from "@/content/shared";
 import { phasesFor, stepsFor } from "@/content/workflows";
-import { pathLabels, type DeviceWorkflow, type MigrationPath, type WorkflowStep } from "@/lib/workflow-types";
+import {
+  pathLabels,
+  type DeviceWorkflow,
+  type MigrationPath,
+  type WorkflowStep,
+} from "@/lib/workflow-types";
 import { percent, progressActions, type DeviceProgress } from "@/lib/progress";
 import { checkpointsFor, firstIncomplete, isStepComplete } from "@/lib/checkpoints";
 import { useSupport, useSupportLocation } from "@/lib/support";
@@ -76,8 +107,14 @@ export function StepView({ workflow, progress, path }: Props) {
     const i = steps.findIndex((s) => s.id === "update");
     progressActions.goTo(workflow.id, Math.max(0, i));
   };
-  const toggleCheck = useCallback((i: number) => progressActions.toggleCheckpoint(workflow.id, step.id, i), [workflow.id, step.id]);
-  const onScreenPassed = useCallback((i: number) => progressActions.completeCheckpoint(workflow.id, step.id, i), [workflow.id, step.id]);
+  const toggleCheck = useCallback(
+    (i: number) => progressActions.toggleCheckpoint(workflow.id, step.id, i),
+    [workflow.id, step.id],
+  );
+  const onScreenPassed = useCallback(
+    (i: number) => progressActions.completeCheckpoint(workflow.id, step.id, i),
+    [workflow.id, step.id],
+  );
 
   if (gateNeeded) {
     return (
@@ -93,8 +130,13 @@ export function StepView({ workflow, progress, path }: Props) {
   }
 
   const left = step.sequence ? (
-    <DeviceSimulator sequence={step.sequence} frame={workflow.frame} resetKey={`${workflow.id}-${step.id}`} syncIndex={current} onScreenPassed={onScreenPassed} />
-
+    <DeviceSimulator
+      sequence={step.sequence}
+      frame={workflow.frame}
+      resetKey={`${workflow.id}-${step.id}`}
+      syncIndex={current}
+      onScreenPassed={onScreenPassed}
+    />
   ) : step.screen ? (
     <DeviceScreen screen={step.screen} frame={workflow.frame} lookFor={step.lookFor} />
   ) : (
@@ -126,7 +168,14 @@ export function StepView({ workflow, progress, path }: Props) {
           <p className="mt-2 text-lg text-muted-foreground">{step.intro}</p>
           <div className="mt-3 flex flex-wrap gap-2">
             {step.why && <WhyPopover title={step.why.title} body={step.why.body} />}
-            {step.whatNext && <WhyPopover icon="next" label="What happens next?" title="What happens next?" body={step.whatNext} />}
+            {step.whatNext && (
+              <WhyPopover
+                icon="next"
+                label="What happens next?"
+                title="What happens next?"
+                body={step.whatNext}
+              />
+            )}
             {(step.sequence || step.screen) && (
               <Button variant="soft" size="sm" onClick={() => setLightbox(true)}>
                 <Expand aria-hidden /> Show me bigger
@@ -159,7 +208,9 @@ export function StepView({ workflow, progress, path }: Props) {
         {isVerify ? (
           <div className="space-y-4">
             <div>
-              <h2 className="mb-3 text-sm font-extrabold uppercase tracking-[0.18em] text-muted-foreground">What to do</h2>
+              <h2 className="mb-3 text-sm font-extrabold uppercase tracking-[0.18em] text-muted-foreground">
+                What to do
+              </h2>
               <InstructionPanel checkpoints={checkpoints} done={done} current={current} />
             </div>
             <VersionCheck
@@ -174,17 +225,33 @@ export function StepView({ workflow, progress, path }: Props) {
         ) : (
           checkpoints.length > 0 && (
             <div>
-              <h2 className="mb-3 text-sm font-extrabold uppercase tracking-[0.18em] text-muted-foreground">What to do</h2>
-              <InstructionPanel checkpoints={checkpoints} done={done} current={current} onToggle={toggleCheck} />
+              <h2 className="mb-3 text-sm font-extrabold uppercase tracking-[0.18em] text-muted-foreground">
+                What to do
+              </h2>
+              <InstructionPanel
+                checkpoints={checkpoints}
+                done={done}
+                current={current}
+                onToggle={toggleCheck}
+              />
             </div>
           )
         )}
 
         {step.extras?.includes("authError") && (
           <details className="rounded-2xl border border-danger/30 bg-danger-soft p-4">
-            <summary className="cursor-pointer text-base font-extrabold text-foreground">Seeing an error or sign-in problem? What does this mean?</summary>
+            <summary className="cursor-pointer text-base font-extrabold text-foreground">
+              Seeing an error or sign-in problem? What does this mean?
+            </summary>
             <p className="mt-2 text-base font-semibold">{authErrorHelp.body}</p>
-            <Button variant="destructive" size="lg" className="mt-3" onClick={() => openSupport({ view: "request", issue: "Sign-in or authentication error" })}>
+            <Button
+              variant="destructive"
+              size="lg"
+              className="mt-3"
+              onClick={() =>
+                openSupport({ view: "request", issue: "Sign-in or authentication error" })
+              }
+            >
               <Headset aria-hidden /> Contact Field Support
             </Button>
           </details>
@@ -197,7 +264,12 @@ export function StepView({ workflow, progress, path }: Props) {
         <aside className="rounded-2xl bg-muted/60 p-4">
           <p className="text-base font-extrabold">{supportMessage.title}</p>
           <p className="mt-1 text-sm font-semibold text-muted-foreground">{supportMessage.body}</p>
-          <Button variant="soft" size="sm" className="mt-3" onClick={() => openSupport({ view: "menu" })}>
+          <Button
+            variant="soft"
+            size="sm"
+            className="mt-3"
+            onClick={() => openSupport({ view: "menu" })}
+          >
             <Headset aria-hidden /> Contact Field Support
           </Button>
         </aside>
@@ -216,62 +288,134 @@ export function StepView({ workflow, progress, path }: Props) {
           variant={isComplete ? "success" : stepDone && canAdvance ? "default" : "outline"}
           onClick={goNext}
           disabled={!canAdvance}
-          className={cn("relative overflow-hidden transition-all", stepDone && canAdvance && !isComplete && "shadow-float")}
+          className={cn(
+            "relative overflow-hidden transition-all",
+            stepDone && canAdvance && !isComplete && "shadow-float",
+          )}
         >
           <AnimatePresence initial={false}>
             {stepDone && canAdvance && (
-              <motion.span key="check" initial={{ scale: 0, rotate: -40 }} animate={{ scale: 1, rotate: 0 }} className="flex">
+              <motion.span
+                key="check"
+                initial={{ scale: 0, rotate: -40 }}
+                animate={{ scale: 1, rotate: 0 }}
+                className="flex"
+              >
                 <Check aria-hidden />
               </motion.span>
             )}
           </AnimatePresence>
-          <span className="truncate">{isDone ? "Finish this device" : stepDone || isVerify || isComplete ? step.nextLabel : "I did all of this on my real device"}</span>
+          <span className="truncate">
+            {isDone
+              ? "Finish this device"
+              : stepDone || isVerify || isComplete
+                ? step.nextLabel
+                : "I did all of this on my real device"}
+          </span>
           <ArrowRight aria-hidden />
         </Button>
-        {isVerify && !verified && <span className="hidden text-center text-xs font-bold text-muted-foreground sm:block">Answer the version question above to continue</span>}
+        {isVerify && !verified && (
+          <span className="hidden text-center text-xs font-bold text-muted-foreground sm:block">
+            Answer the version question above to continue
+          </span>
+        )}
         {!isVerify && !stepDone && !isComplete && (
           <span className="hidden text-center text-xs font-bold text-muted-foreground sm:block">
-            {step.sequence ? "Finish the practice device, or tap above if you already did every task" : "Tick each task, or tap above once you did all of them"}
+            {step.sequence
+              ? "Finish the practice device, or tap above if you already did every task"
+              : "Tick each task, or tap above once you did all of them"}
           </span>
         )}
       </div>
-      <Button asChild variant="ghost" size="lg" className="max-sm:col-span-2 max-sm:mr-40 max-sm:justify-self-start max-sm:h-10">
+      <Button
+        asChild
+        variant="ghost"
+        size="lg"
+        className="max-sm:col-span-2 max-sm:mr-40 max-sm:justify-self-start max-sm:h-10"
+      >
         <Link to="/" aria-label="Pause, progress saved">
-          <PauseCircle aria-hidden /> <span>Pause<span className="hidden sm:inline"> · progress saved</span></span>
+          <PauseCircle aria-hidden />{" "}
+          <span>
+            Pause<span className="hidden sm:inline"> · progress saved</span>
+          </span>
         </Link>
       </Button>
     </div>
   );
 
   return (
-    <StepShell deviceName={workflow.name} pathLabel={pathLabels[path]} phases={phases} currentPhase={step.phase ?? "Step"} index={index} total={total} completed={progress.completed} left={left} right={right} bottom={bottom}>
-      <TroubleshootDialog open={different} onOpenChange={setDifferent} answers={step.troubleshoot} />
+    <StepShell
+      deviceName={workflow.name}
+      pathLabel={pathLabels[path]}
+      phases={phases}
+      currentPhase={step.phase ?? "Step"}
+      index={index}
+      total={total}
+      completed={progress.completed}
+      left={left}
+      right={right}
+      bottom={bottom}
+    >
+      <TroubleshootDialog
+        open={different}
+        onOpenChange={setDifferent}
+        answers={step.troubleshoot}
+      />
       <Dialog open={lightbox} onOpenChange={setLightbox}>
         <DialogContent className="max-h-[92vh] max-w-lg overflow-y-auto rounded-3xl p-6">
           <DialogHeader className="text-left">
-            <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-primary">Step {index + 1} · practice device</p>
+            <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-primary">
+              Step {index + 1} · practice device
+            </p>
             <DialogTitle className="text-2xl">{step.title}</DialogTitle>
             <DialogDescription className="text-base">{step.intro}</DialogDescription>
           </DialogHeader>
           {step.sequence ? (
-            <DeviceSimulator sequence={step.sequence} frame={workflow.frame} resetKey={`big-${step.id}`} syncIndex={current} onScreenPassed={onScreenPassed} large />
-
+            <DeviceSimulator
+              sequence={step.sequence}
+              frame={workflow.frame}
+              resetKey={`big-${step.id}`}
+              syncIndex={current}
+              onScreenPassed={onScreenPassed}
+              large
+            />
           ) : step.screen ? (
-            <DeviceScreen screen={step.screen} frame={workflow.frame} lookFor={step.lookFor} large />
+            <DeviceScreen
+              screen={step.screen}
+              frame={workflow.frame}
+              lookFor={step.lookFor}
+              large
+            />
           ) : null}
           <Button size="xl" variant="outline" onClick={() => setLightbox(false)}>
             Close
           </Button>
         </DialogContent>
       </Dialog>
-      <AnotherDeviceDialog open={anotherOpen} onOpenChange={setAnotherOpen} deviceName={workflow.name} onYes={() => navigate({ to: "/", search: { choose: true } })} onNo={() => navigate({ to: "/complete" })} />
+      <AnotherDeviceDialog
+        open={anotherOpen}
+        onOpenChange={setAnotherOpen}
+        deviceName={workflow.name}
+        onYes={() => navigate({ to: "/", search: { choose: true } })}
+        onNo={() => navigate({ to: "/complete" })}
+      />
     </StepShell>
   );
 }
 
 /* ---------------- pieces ---------------- */
 
-function WhyPopover({ title, body, label = "Why?", icon = "why" }: { title: string; body: string; label?: string; icon?: "why" | "next" }) {
+function WhyPopover({
+  title,
+  body,
+  label = "Why?",
+  icon = "why",
+}: {
+  title: string;
+  body: string;
+  label?: string;
+  icon?: "why" | "next";
+}) {
   return (
     <Popover>
       <PopoverTrigger asChild>
@@ -301,13 +445,30 @@ function WaitingBanner() {
       </div>
       <div>
         <p className="text-base font-extrabold">Your device is being configured.</p>
-        <p className="text-sm font-semibold text-muted-foreground">Please keep the device connected to power and do not restart it unless instructed. It is not frozen.</p>
+        <p className="text-sm font-semibold text-muted-foreground">
+          Please keep the device connected to power and do not restart it unless instructed. It is
+          not frozen.
+        </p>
       </div>
     </div>
   );
 }
 
-function ResetGate({ workflow, index, total, onConfirm, onBack, onHelp }: { workflow: DeviceWorkflow; index: number; total: number; onConfirm: () => void; onBack: () => void; onHelp: () => void }) {
+function ResetGate({
+  workflow,
+  index,
+  total,
+  onConfirm,
+  onBack,
+  onHelp,
+}: {
+  workflow: DeviceWorkflow;
+  index: number;
+  total: number;
+  onConfirm: () => void;
+  onBack: () => void;
+  onHelp: () => void;
+}) {
   const reduce = useReducedMotion();
   return (
     <div className="flex min-h-screen flex-col bg-warning-soft/40">
@@ -331,7 +492,9 @@ function ResetGate({ workflow, index, total, onConfirm, onBack, onHelp }: { work
               <ShieldAlert className="h-7 w-7" aria-hidden />
             </span>
             <div>
-              <p className="text-sm font-extrabold uppercase tracking-[0.18em] text-warning-foreground">{resetWarning.eyebrow}</p>
+              <p className="text-sm font-extrabold uppercase tracking-[0.18em] text-warning-foreground">
+                {resetWarning.eyebrow}
+              </p>
               <h1 id="step-title" className="text-3xl">
                 {resetWarning.title}
               </h1>
@@ -342,12 +505,15 @@ function ResetGate({ workflow, index, total, onConfirm, onBack, onHelp }: { work
               <Check className="h-4 w-4" aria-hidden />
             </span>
             <p className="text-base font-extrabold">
-              {resetWarning.updated} <span className="font-semibold text-muted-foreground">{resetWarning.next}</span>
+              {resetWarning.updated}{" "}
+              <span className="font-semibold text-muted-foreground">{resetWarning.next}</span>
             </p>
           </div>
           <p className="text-lg font-semibold">{resetWarning.body}</p>
           <div className="rounded-2xl bg-muted p-4">
-            <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-muted-foreground">Device</p>
+            <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-muted-foreground">
+              Device
+            </p>
             <p className="mt-1 text-xl font-black text-primary">{workflow.name}</p>
             <p className="text-base text-muted-foreground">{workflow.description}</p>
           </div>
@@ -372,28 +538,49 @@ function ResetGate({ workflow, index, total, onConfirm, onBack, onHelp }: { work
 function TestFlightPanel() {
   const { open } = useSupport();
   const [mode, setMode] = useState<"install" | "update" | null>(null);
-  const normalSteps = mode === "install" ? testflight.install : mode === "update" ? testflight.update : null;
+  const normalSteps =
+    mode === "install" ? testflight.install : mode === "update" ? testflight.update : null;
   return (
-    <section className="rounded-2xl border bg-muted/40 p-4" aria-labelledby="testflight-guide-title">
+    <section
+      className="rounded-2xl border bg-muted/40 p-4"
+      aria-labelledby="testflight-guide-title"
+    >
       <div className="rounded-2xl border border-primary/20 bg-primary-soft p-4">
-        <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-primary">Required after erase</p>
-        <h2 id="testflight-guide-title" className="mt-1 text-2xl">Reinstall Sprinter Health</h2>
-        <p className="mt-2 text-base font-bold">The app disappearing after an erase is expected. Start with the original TestFlight invitation email on this device.</p>
+        <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-primary">
+          Required after erase
+        </p>
+        <h2 id="testflight-guide-title" className="mt-1 text-2xl">
+          Reinstall Sprinter Health
+        </h2>
+        <p className="mt-2 text-base font-bold">
+          The app disappearing after an erase is expected. Start with the original TestFlight
+          invitation email on this device.
+        </p>
       </div>
 
       {/* Section 1, normal install/update */}
       <div className="mt-4 space-y-4">
         <div className="flex items-center gap-2">
-          <span className="rounded-full bg-primary px-3 py-1 text-xs font-black uppercase tracking-wider text-primary-foreground">Section 1</span>
+          <span className="rounded-full bg-primary px-3 py-1 text-xs font-black uppercase tracking-wider text-primary-foreground">
+            Section 1
+          </span>
           <span className="text-base font-extrabold">Install or Update Sprinter Health</span>
         </div>
         <p className="text-base font-semibold text-muted-foreground">{testflight.what}</p>
         <p className="rounded-2xl bg-primary-soft p-3 text-sm font-bold">{testflight.rule}</p>
         <div className="grid gap-2 sm:grid-cols-2">
-          <Button variant={mode === "install" ? "default" : "outline"} size="lg" onClick={() => setMode("install")}>
+          <Button
+            variant={mode === "install" ? "default" : "outline"}
+            size="lg"
+            onClick={() => setMode("install")}
+          >
             Install app
           </Button>
-          <Button variant={mode === "update" ? "default" : "outline"} size="lg" onClick={() => setMode("update")}>
+          <Button
+            variant={mode === "update" ? "default" : "outline"}
+            size="lg"
+            onClick={() => setMode("update")}
+          >
             Update app
           </Button>
         </div>
@@ -401,7 +588,9 @@ function TestFlightPanel() {
           <ol className="space-y-2">
             {normalSteps.map((s, i) => (
               <li key={s} className="flex gap-3 text-base font-semibold">
-                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary-soft text-sm font-black text-primary">{i + 1}</span>
+                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary-soft text-sm font-black text-primary">
+                  {i + 1}
+                </span>
                 {s}
               </li>
             ))}
@@ -420,7 +609,10 @@ function TestFlightPanel() {
           </ol>
           <div className="mt-3 flex flex-wrap items-center gap-2">
             <span className="text-sm font-extrabold">{testflight.redeemCode.still}</span>
-            <Button size="sm" onClick={() => open({ view: "request", issue: "TestFlight / redeem code problem" })}>
+            <Button
+              size="sm"
+              onClick={() => open({ view: "request", issue: "TestFlight / redeem code problem" })}
+            >
               <Headset aria-hidden /> Contact Field Support
             </Button>
           </div>
@@ -432,28 +624,43 @@ function TestFlightPanel() {
       {/* Section 2, after erase */}
       <div className="space-y-4">
         <div className="flex flex-wrap items-center gap-2">
-          <span className="rounded-full bg-primary/15 px-3 py-1 text-xs font-black uppercase tracking-wider text-primary">Section 2</span>
+          <span className="rounded-full bg-primary/15 px-3 py-1 text-xs font-black uppercase tracking-wider text-primary">
+            Section 2
+          </span>
           <span className="text-base font-extrabold">{testflightAfterErase.title}</span>
         </div>
-        <p className="rounded-2xl bg-primary-soft p-4 text-base font-bold">{testflightAfterErase.intro}</p>
+        <p className="rounded-2xl bg-primary-soft p-4 text-base font-bold">
+          {testflightAfterErase.intro}
+        </p>
 
         <ol className="space-y-4">
           {testflightAfterErase.steps.map((s, i) => (
             <li key={s.title} className="rounded-2xl bg-card p-4 shadow-soft">
               <div className="flex items-start gap-3">
-                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary-soft text-sm font-black text-primary">{i + 1}</span>
+                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary-soft text-sm font-black text-primary">
+                  {i + 1}
+                </span>
                 <div className="min-w-0 flex-1 space-y-2">
                   <p className="text-lg font-extrabold">{s.title}</p>
                   <p className="text-base font-semibold text-muted-foreground">{s.body}</p>
-                  {s.note && <p className="rounded-xl bg-muted p-3 text-sm font-bold text-foreground">{s.note}</p>}
+                  {s.note && (
+                    <p className="rounded-xl bg-muted p-3 text-sm font-bold text-foreground">
+                      {s.note}
+                    </p>
+                  )}
                   {s.warning && (
                     <p className="flex gap-2 rounded-xl border border-warning/30 bg-warning-soft p-3 text-sm font-bold text-foreground">
-                      <TriangleAlert className="mt-0.5 h-4 w-4 shrink-0 text-warning-foreground" aria-hidden /> {s.warning}
+                      <TriangleAlert
+                        className="mt-0.5 h-4 w-4 shrink-0 text-warning-foreground"
+                        aria-hidden
+                      />{" "}
+                      {s.warning}
                     </p>
                   )}
                   {s.important && (
                     <p className="flex gap-2 rounded-xl border border-primary/20 bg-primary-soft p-3 text-sm font-bold text-foreground">
-                      <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden /> {s.important}
+                      <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden />{" "}
+                      {s.important}
                     </p>
                   )}
                 </div>
@@ -465,19 +672,26 @@ function TestFlightPanel() {
         {/* Error card */}
         <div className="rounded-2xl border border-warning/40 bg-warning-soft p-4">
           <p className="flex items-center gap-2 text-lg font-extrabold text-foreground">
-            <TriangleAlert className="h-5 w-5 text-warning-foreground" aria-hidden /> {testflightAfterErase.errorCard.title}
+            <TriangleAlert className="h-5 w-5 text-warning-foreground" aria-hidden />{" "}
+            {testflightAfterErase.errorCard.title}
           </p>
           <ul className="mt-3 space-y-2">
             {testflightAfterErase.errorCard.bullets.map((b) => (
               <li key={b} className="flex gap-2 text-base font-semibold">
-                <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-warning-foreground" aria-hidden />
+                <span
+                  className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-warning-foreground"
+                  aria-hidden
+                />
                 <span>{b}</span>
               </li>
             ))}
           </ul>
           <div className="mt-4 flex flex-wrap items-center gap-2">
             <span className="text-sm font-extrabold">Still need help?</span>
-            <Button size="sm" onClick={() => open({ view: "request", issue: "TestFlight reinstall after erase" })}>
+            <Button
+              size="sm"
+              onClick={() => open({ view: "request", issue: "TestFlight reinstall after erase" })}
+            >
               <Headset aria-hidden /> Contact Field Support
             </Button>
           </div>
@@ -486,9 +700,12 @@ function TestFlightPanel() {
         {/* Success card */}
         <div className="rounded-2xl border border-success/30 bg-success-soft p-5">
           <p className="flex items-center gap-2 text-xl font-black text-foreground">
-            <Check className="h-6 w-6 text-success" aria-hidden /> {testflightAfterErase.successCard.title}
+            <Check className="h-6 w-6 text-success" aria-hidden />{" "}
+            {testflightAfterErase.successCard.title}
           </p>
-          <p className="mt-2 text-base font-semibold text-muted-foreground">{testflightAfterErase.successCard.body}</p>
+          <p className="mt-2 text-base font-semibold text-muted-foreground">
+            {testflightAfterErase.successCard.body}
+          </p>
         </div>
       </div>
     </section>
@@ -498,15 +715,23 @@ function TestFlightPanel() {
 function PermissionsPanel() {
   return (
     <details className="rounded-2xl border bg-muted/40 p-4">
-      <summary className="cursor-pointer text-base font-extrabold">The app is asking for permissions?</summary>
-      <p className="mt-2 text-base font-semibold text-muted-foreground">These permissions help the app work correctly.</p>
+      <summary className="cursor-pointer text-base font-extrabold">
+        The app is asking for permissions?
+      </summary>
+      <p className="mt-2 text-base font-semibold text-muted-foreground">
+        These permissions help the app work correctly.
+      </p>
       <div className="mt-3 grid gap-3 sm:grid-cols-3">
         {permissions.map((p) => (
           <div key={p.name} className="rounded-2xl bg-card p-4 shadow-soft">
             <p className="text-lg font-black text-primary">{p.name}</p>
-            <p className="mt-1 text-xs font-extrabold uppercase tracking-wide text-muted-foreground">What it does</p>
+            <p className="mt-1 text-xs font-extrabold uppercase tracking-wide text-muted-foreground">
+              What it does
+            </p>
             <p className="text-sm font-semibold">{p.does}</p>
-            <p className="mt-2 text-xs font-extrabold uppercase tracking-wide text-muted-foreground">What to tap</p>
+            <p className="mt-2 text-xs font-extrabold uppercase tracking-wide text-muted-foreground">
+              What to tap
+            </p>
             <p className="text-sm font-semibold">{p.tap}</p>
           </div>
         ))}
@@ -521,14 +746,28 @@ function CompletionPanel({ workflow, path }: { workflow: DeviceWorkflow; path: M
   const [other, setOther] = useState<"yes" | "no" | null>(null);
   return (
     <div className="space-y-5">
-      <motion.div initial={{ rotateY: 90, opacity: 0 }} animate={{ rotateY: 0, opacity: 1 }} transition={{ duration: 0.5 }} className="rounded-2xl bg-success-soft p-5">
+      <motion.div
+        initial={{ rotateY: 90, opacity: 0 }}
+        animate={{ rotateY: 0, opacity: 1 }}
+        transition={{ duration: 0.5 }}
+        className="rounded-2xl bg-success-soft p-5"
+      >
         <p className="flex items-center gap-2 text-xl font-black text-foreground">
           <Sparkles className="text-success" aria-hidden /> {workflow.name} is ready
         </p>
         <p className="text-sm font-bold text-muted-foreground">{pathLabels[path]}</p>
-        <motion.ul initial="hidden" animate="show" variants={{ show: { transition: { staggerChildren: 0.12, delayChildren: 0.3 } } }} className="mt-3 space-y-2">
+        <motion.ul
+          initial="hidden"
+          animate="show"
+          variants={{ show: { transition: { staggerChildren: 0.12, delayChildren: 0.3 } } }}
+          className="mt-3 space-y-2"
+        >
           {workflow.completionChecklist[path].map((c) => (
-            <motion.li key={c} variants={{ hidden: { opacity: 0, x: -10 }, show: { opacity: 1, x: 0 } }} className="flex items-center gap-3 text-base font-extrabold text-foreground">
+            <motion.li
+              key={c}
+              variants={{ hidden: { opacity: 0, x: -10 }, show: { opacity: 1, x: 0 } }}
+              className="flex items-center gap-3 text-base font-extrabold text-foreground"
+            >
               <span className="flex h-7 w-7 items-center justify-center rounded-full bg-success text-success-foreground">
                 <Check className="h-4 w-4" aria-hidden />
               </span>
@@ -539,15 +778,37 @@ function CompletionPanel({ workflow, path }: { workflow: DeviceWorkflow; path: M
       </motion.div>
 
       <div className="rounded-2xl border p-4">
-        <p className="text-lg font-extrabold">How is your device working? Are you having any connectivity problems?</p>
+        <p className="text-lg font-extrabold">
+          How is your device working? Are you having any connectivity problems?
+        </p>
         <div className="mt-3 grid gap-2 sm:grid-cols-2">
-          <Button variant={conn === "no" ? "success" : "outline"} size="lg" onClick={() => setConn("no")}>No, everything is working</Button>
-          <Button variant={conn === "yes" ? "warning" : "outline"} size="lg" onClick={() => setConn("yes")}>Yes. I'm having problems</Button>
+          <Button
+            variant={conn === "no" ? "success" : "outline"}
+            size="lg"
+            onClick={() => setConn("no")}
+          >
+            No, everything is working
+          </Button>
+          <Button
+            variant={conn === "yes" ? "warning" : "outline"}
+            size="lg"
+            onClick={() => setConn("yes")}
+          >
+            Yes. I'm having problems
+          </Button>
         </div>
         {conn === "yes" && (
           <div className="mt-3 rounded-2xl bg-warning-soft p-4">
-            <p className="text-base font-extrabold">Please tell Field Support before finishing your migration.</p>
-            <Button size="lg" className="mt-3" onClick={() => open({ view: "request", issue: "Connectivity problem after migration" })}>
+            <p className="text-base font-extrabold">
+              Please tell Field Support before finishing your migration.
+            </p>
+            <Button
+              size="lg"
+              className="mt-3"
+              onClick={() =>
+                open({ view: "request", issue: "Connectivity problem after migration" })
+              }
+            >
               <Headset aria-hidden /> Report a connectivity issue
             </Button>
           </div>
@@ -555,15 +816,36 @@ function CompletionPanel({ workflow, path }: { workflow: DeviceWorkflow; path: M
       </div>
 
       <div className="rounded-2xl border p-4">
-        <p className="text-lg font-extrabold">Are you having any other problems with your Sprinter Health devices or apps?</p>
+        <p className="text-lg font-extrabold">
+          Are you having any other problems with your Sprinter Health devices or apps?
+        </p>
         <div className="mt-3 grid gap-2 sm:grid-cols-2">
-          <Button variant={other === "no" ? "success" : "outline"} size="lg" onClick={() => setOther("no")}>No</Button>
-          <Button variant={other === "yes" ? "warning" : "outline"} size="lg" onClick={() => setOther("yes")}>Yes</Button>
+          <Button
+            variant={other === "no" ? "success" : "outline"}
+            size="lg"
+            onClick={() => setOther("no")}
+          >
+            No
+          </Button>
+          <Button
+            variant={other === "yes" ? "warning" : "outline"}
+            size="lg"
+            onClick={() => setOther("yes")}
+          >
+            Yes
+          </Button>
         </div>
         {other === "yes" && (
           <div className="mt-3 rounded-2xl bg-warning-soft p-4">
-            <p className="text-base font-extrabold">This is a good time to let IT know. Please tell us what is happening so we can address it.</p>
-            <Button size="lg" className="mt-3" onClick={() => open({ view: "request", issue: "Other device or app problem" })}>
+            <p className="text-base font-extrabold">
+              This is a good time to let IT know. Please tell us what is happening so we can address
+              it.
+            </p>
+            <Button
+              size="lg"
+              className="mt-3"
+              onClick={() => open({ view: "request", issue: "Other device or app problem" })}
+            >
               <Headset aria-hidden /> Report an issue
             </Button>
           </div>
@@ -573,16 +855,35 @@ function CompletionPanel({ workflow, path }: { workflow: DeviceWorkflow; path: M
   );
 }
 
-function AnotherDeviceDialog({ open, onOpenChange, deviceName, onYes, onNo }: { open: boolean; onOpenChange: (o: boolean) => void; deviceName: string; onYes: () => void; onNo: () => void }) {
+function AnotherDeviceDialog({
+  open,
+  onOpenChange,
+  deviceName,
+  onYes,
+  onNo,
+}: {
+  open: boolean;
+  onOpenChange: (o: boolean) => void;
+  deviceName: string;
+  onYes: () => void;
+  onNo: () => void;
+}) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md rounded-3xl p-6">
         <DialogHeader className="text-left">
-          <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring", stiffness: 300, damping: 18 }} className="mb-2 flex h-14 w-14 items-center justify-center rounded-full bg-success text-success-foreground">
+          <motion.span
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ type: "spring", stiffness: 300, damping: 18 }}
+            className="mb-2 flex h-14 w-14 items-center justify-center rounded-full bg-success text-success-foreground"
+          >
             <Check className="h-7 w-7" aria-hidden />
           </motion.span>
           <DialogTitle className="text-2xl">You finished this device.</DialogTitle>
-          <DialogDescription className="text-base">{deviceName} is done. Do you need to update another device?</DialogDescription>
+          <DialogDescription className="text-base">
+            {deviceName} is done. Do you need to update another device?
+          </DialogDescription>
         </DialogHeader>
         <div className="grid gap-2 pt-2">
           <Button size="xl" onClick={onYes}>
