@@ -26,6 +26,7 @@ import {
 import { Popover, PopoverClose, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { DeviceScreen } from "./DeviceScreen";
 import { DeviceSimulator } from "./DeviceSimulator";
+import { DeviceConfirmationCard } from "./ConfirmationCode";
 import { InstructionPanel } from "./InstructionPanel";
 import { StepShell } from "./StepShell";
 import { HoldToConfirm } from "./HoldToConfirm";

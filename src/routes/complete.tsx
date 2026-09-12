@@ -1,11 +1,14 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect } from "react";
 import { motion } from "motion/react";
 import { ArrowRight, Check, Headset, PartyPopper } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { CopyButton } from "@/components/ConfirmationCode";
 import { SiteHeader } from "@/components/SiteHeader";
 import { support as supportCopy } from "@/content/config";
 import { deviceOrder, workflows } from "@/content/workflows";
-import { summary, useProgress } from "@/lib/progress";
+import { progressActions, summary, useProgress } from "@/lib/progress";
+import { masterCodeFor, summaryText } from "@/lib/confirmation";
 import { useSupport, useSupportLocation } from "@/lib/support";
 import { pathLabels } from "@/lib/workflow-types";
 
