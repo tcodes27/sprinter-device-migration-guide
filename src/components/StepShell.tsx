@@ -51,7 +51,7 @@ export function StepShell({ deviceName, index, total, completed, left, right, bo
       </main>
 
       <div className="fixed inset-x-0 bottom-0 z-30 border-t bg-card/95 backdrop-blur">
-        <div className="mx-auto max-w-6xl px-4 py-3">{bottom}</div>
+        <div className="mx-auto max-w-6xl px-4 py-3 pr-44 max-lg:pr-4">{bottom}</div>
       </div>
       {children}
     </div>
