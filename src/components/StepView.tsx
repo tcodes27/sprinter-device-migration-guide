@@ -81,6 +81,8 @@ export function StepView({ workflow, progress, path }: Props) {
   const canAdvance = isVerify ? verified : true;
   const isDone = progress.finished && index === total - 1;
   const currentAction = !stepDone && !gateNeeded ? checkpoints[current]?.label : undefined;
+  const mobileNextLabel =
+    step.nextLabel === "Sprinter Health is installed" ? "App installed" : step.nextLabel;
 
   useSupportLocation({
     deviceId: workflow.id,
@@ -286,7 +288,7 @@ export function StepView({ workflow, progress, path }: Props) {
           onClick={goNext}
           disabled={!canAdvance}
           className={cn(
-            "relative overflow-hidden transition-all",
+            "relative min-w-0 overflow-hidden transition-all max-sm:gap-1.5 max-sm:px-3 max-sm:text-base",
             stepDone && canAdvance && !isComplete && "shadow-float",
           )}
         >
@@ -302,18 +304,18 @@ export function StepView({ workflow, progress, path }: Props) {
               </motion.span>
             )}
           </AnimatePresence>
-          <span className="hidden truncate sm:inline">
+          <span className="hidden min-w-0 flex-1 truncate text-center sm:inline">
             {isDone
               ? "Finish this device"
               : stepDone || isVerify || isComplete
                 ? step.nextLabel
                 : "I did all of this on my real device"}
           </span>
-          <span className="sm:hidden">
+          <span className="min-w-0 flex-1 truncate text-center sm:hidden">
             {isDone
               ? "Finish device"
               : stepDone || isVerify || isComplete
-                ? step.nextLabel
+                ? mobileNextLabel
                 : "Done with this step"}
           </span>
           <ArrowRight aria-hidden />
