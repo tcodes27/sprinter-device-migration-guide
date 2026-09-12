@@ -21,7 +21,10 @@ export type StepKind = "instruction" | "waiting" | "verify-version" | "complete"
 /** What the IT message asked the Sprinter to do. The app never decides this. */
 export type MigrationPath = "update" | "update-reset";
 
-export const pathLabels: Record<MigrationPath, string> = { update: "Update only", "update-reset": "Update + Reset" };
+export const pathLabels: Record<MigrationPath, string> = {
+  update: "Update only",
+  "update-reset": "Update + Reset",
+};
 
 /* ---------------- Tap-along simulator model ---------------- */
 
@@ -43,7 +46,14 @@ export type SimItem = {
 export type SimScreen =
   | { kind: "home"; hint: string; apps: SimItem[] }
   | { kind: "list"; hint: string; title: string; items: SimItem[]; back?: string; footer?: SimItem }
-  | { kind: "prompt"; hint: string; title: string; body?: string; field?: string; buttons: SimItem[] }
+  | {
+      kind: "prompt";
+      hint: string;
+      title: string;
+      body?: string;
+      field?: string;
+      buttons: SimItem[];
+    }
   | { kind: "hello"; hint: string; label?: string }
   | { kind: "progress"; hint: string; title: string; body?: string; durationMs: number }
   | { kind: "final"; hint: string; title: string; body?: string; apps?: string[] };
@@ -72,7 +82,7 @@ export type WorkflowStep = {
   /** Show the "Before you reset" confirmation gate before this step */
   resetGate?: boolean;
   /** Extra guided panels available on this step */
-  extras?: ("testflight" | "permissions" | "authError")[];
+  extras?: ("testflightAfterErase" | "permissions" | "authError")[];
   /** Optional step-specific troubleshooting answers */
   troubleshoot?: Partial<Record<TroubleChoice, string>>;
   /** Which IT-requested paths include this step. Omitted = every path. */
