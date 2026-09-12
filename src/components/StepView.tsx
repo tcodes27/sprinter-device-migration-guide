@@ -170,11 +170,11 @@ export function StepView({ workflow, progress }: Props) {
           <span className="truncate">{isDone ? "Back to my devices" : step.nextLabel}</span>
           <ArrowRight aria-hidden />
         </Button>
-        {!simDone && !isComplete && <span className="text-center text-xs font-bold text-muted-foreground">Finish the practice device, or tap above if you already did this</span>}
+        {!simDone && !isComplete && <span className="hidden text-center text-xs font-bold text-muted-foreground sm:block">Finish the practice device, or tap above if you already did this</span>}
       </div>
-      <Button asChild variant="ghost" size="lg" className="col-span-2 justify-self-center sm:col-span-1">
-        <Link to="/">
-          <PauseCircle aria-hidden /> <span>Pause · progress saved</span>
+      <Button asChild variant="ghost" size="lg" className="max-sm:col-span-2 max-sm:mr-40 max-sm:justify-self-start max-sm:h-10">
+        <Link to="/" aria-label="Pause — progress saved">
+          <PauseCircle aria-hidden /> <span>Pause<span className="hidden sm:inline"> · progress saved</span></span>
         </Link>
       </Button>
     </div>
