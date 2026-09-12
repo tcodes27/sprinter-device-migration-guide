@@ -208,7 +208,7 @@ export const progressActions = {
     const total = iphoneSteps.length;
     const all = Array.from({ length: total }, (_, i) => i);
     const allDone = (steps: typeof iphoneSteps, upTo: number) => Object.fromEntries(steps.slice(0, upTo).map((st) => [st.id, checkpointsFor(st).map((c) => c.id)]));
-    s.iphone = { path: "update-reset", current: total - 1, completed: all, verified: [1], checkpoints: allDone(iphoneSteps, total), answers: { [iphoneSteps[1]!.id]: "matches" }, gates: ["reset"], finished: true, started: true };
+    s.iphone = { path: "update-reset", current: total - 1, completed: all, verified: [1], checkpoints: allDone(iphoneSteps, total), answers: { [iphoneSteps[1]!.id]: "matches" }, gates: ["reset"], finished: true, started: true, confirmationCode: deviceConfirmationCode("iphone"), completedAt: new Date().toISOString() };
     s["ipad-mini"] = { ...emptyDevice(), path: "update", started: true };
     const patientSteps = stepsFor(workflows["patient-ipad"], "update-reset");
     s["patient-ipad"] = { ...emptyDevice(), path: "update-reset", current: 1, completed: [0], checkpoints: allDone(patientSteps, 1), started: true };

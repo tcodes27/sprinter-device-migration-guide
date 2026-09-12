@@ -746,6 +746,7 @@ function CompletionPanel({ workflow, path }: { workflow: DeviceWorkflow; path: M
   const [other, setOther] = useState<"yes" | "no" | null>(null);
   return (
     <div className="space-y-5">
+      <DeviceConfirmationCard device={workflow.id} />
       <motion.div
         initial={{ rotateY: 90, opacity: 0 }}
         animate={{ rotateY: 0, opacity: 1 }}
