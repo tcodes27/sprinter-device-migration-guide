@@ -21,4 +21,4 @@
 
 - [x] Per-device confirmation codes issued on finish, persisted across refresh
 - [x] Master completion code + copyable summary on "You're all set" for the Field Support ticket reply
-- [ ] Verify in browser (codes appear, copy works, refresh keeps them)
+- [x] Verify in browser (codes appear, copy works, refresh keeps them)
