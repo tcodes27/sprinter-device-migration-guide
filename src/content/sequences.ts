@@ -71,7 +71,7 @@ export function buildSequences(c: DeviceCopy): Record<string, SimScreen[]> {
     { kind: "prompt", hint: "Tap Continue", title: c.eraseTitle, body: "Apps & Data · Settings · Accounts", buttons: [T("Continue")] },
     { kind: "prompt", hint: `Enter your ${c.name} passcode if asked`, title: "Enter Passcode", field: "● ● ● ● ● ●", buttons: [T("Enter passcode")] },
     { kind: "prompt", hint: `Tap ${c.eraseButton} to confirm`, title: `${c.eraseButton}?`, body: "This cannot be undone.", buttons: [T(c.eraseButton, { destructive: true }), row("Cancel")] },
-    { kind: "progress", hint: `Wait — the ${c.name} restarts on its own`, title: "Erasing…", body: "The screen goes dark, then shows an Apple logo.", durationMs: 2400 },
+    { kind: "progress", hint: `Wait, the ${c.name} restarts on its own`, title: "Erasing…", body: "The screen goes dark, then shows an Apple logo.", durationMs: 2400 },
     { kind: "final", hint: "The device is restarting", title: "Restarting", body: "This can take a few minutes. Keep it plugged in." },
   ];
 
@@ -171,7 +171,7 @@ export const deviceCopy: Record<DeviceId, DeviceCopy> = {
     eraseTitle: "Erase This iPad",
     eraseButton: "Erase iPad",
     biometric: "Touch ID",
-    apps: ["Sprinter Visit", "Safari", "Camera", "Photos", "Mail"],
+    apps: ["Sprinter Health", "Safari", "Camera", "Photos", "Mail"],
     helloLabel: "Press home to open",
   },
 };

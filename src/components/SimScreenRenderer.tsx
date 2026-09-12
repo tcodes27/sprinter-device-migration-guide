@@ -34,7 +34,7 @@ export function SimScreenRenderer({ screen, onTap, pressing, showCoach, reducedM
             key={a.label}
             type="button"
             onClick={() => onTap(a)}
-            aria-label={a.target ? `${a.label} — tap this` : a.label}
+            aria-label={a.target ? `${a.label}, tap this` : a.label}
             className="relative flex flex-col items-center gap-1 rounded-xl focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring/40"
           >
             {a.target && <Coach />}
@@ -67,7 +67,7 @@ export function SimScreenRenderer({ screen, onTap, pressing, showCoach, reducedM
               key={item.label}
               type="button"
               onClick={() => onTap(item)}
-              aria-label={item.target ? `${item.label} — tap this` : item.label}
+              aria-label={item.target ? `${item.label}, tap this` : item.label}
               className={cn(
                 "relative flex w-full items-center justify-between rounded-xl bg-screen-row px-3 py-2.5 text-left text-xs font-semibold text-foreground transition-transform focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring/40",
                 item.destructive && "text-danger",
@@ -114,7 +114,7 @@ export function SimScreenRenderer({ screen, onTap, pressing, showCoach, reducedM
               key={b.label}
               type="button"
               onClick={() => onTap(b)}
-              aria-label={b.target ? `${b.label} — tap this` : b.label}
+              aria-label={b.target ? `${b.label}, tap this` : b.label}
               className={cn(
                 "relative w-full rounded-xl py-2.5 text-xs font-extrabold transition-transform focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring/40",
                 b.destructive ? "bg-danger text-danger-foreground" : b.target ? "bg-primary text-primary-foreground" : "bg-screen-row text-primary",
@@ -137,7 +137,7 @@ export function SimScreenRenderer({ screen, onTap, pressing, showCoach, reducedM
         <button
           type="button"
           onClick={() => onTap({ label: screen.label ?? "Open", target: true })}
-          aria-label={`${screen.label ?? "Open"} — tap this`}
+          aria-label={`${screen.label ?? "Open"}, tap this`}
           className={cn("relative flex w-full flex-col items-center gap-1 rounded-2xl bg-screen-row py-3 text-[11px] font-extrabold text-primary transition-transform", "tap-glow", pressing && "scale-95 bg-warning-soft")}
         >
           <Coach />
@@ -196,7 +196,7 @@ function ProgressScreen({ title, body, durationMs }: { title: string; body?: str
         <div className="h-full rounded-full bg-primary transition-[width] duration-100" style={{ width: `${pct}%` }} />
       </div>
       {body && <p className="text-[11px] font-semibold text-muted-foreground">{body}</p>}
-      <p className="rounded-full bg-warning-soft px-3 py-1 text-[10px] font-extrabold text-warning-foreground">This is normal — it's not frozen</p>
+      <p className="rounded-full bg-warning-soft px-3 py-1 text-[10px] font-extrabold text-warning-foreground">This is normal, it's not frozen</p>
     </div>
   );
 }

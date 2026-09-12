@@ -45,7 +45,7 @@ const iphoneSteps: WorkflowStep[] = [
     lookFor: "Software Update",
     why: updateWhy,
     whatNext: "After the update finishes, you will check the software version. If IT asked for a reset, that comes after.",
-    nextLabel: "Update is done — check it",
+    nextLabel: "Update is done, check it",
   },
   {
     id: "verify-update",
@@ -56,7 +56,7 @@ const iphoneSteps: WorkflowStep[] = [
     screen: { kind: "list", title: "Software Update", rows: [{ label: "Automatic Updates", value: "On" }, { label: "iOS version", value: "See IT instructions", highlight: true }, { label: "Your iPhone is up to date" }] },
     lookFor: "The software version shown on your iPhone",
     why: { title: "Why check the version?", body: "The app cannot see your iPhone. Only you can confirm the update finished. Checking the version makes sure the next steps will work." },
-    nextLabel: "Version confirmed — continue",
+    nextLabel: "Version confirmed, continue",
   },
   {
     id: "reset",
@@ -95,7 +95,7 @@ const iphoneSteps: WorkflowStep[] = [
       "Tap Continue.",
       "If asked, enter your iPhone passcode.",
       "Tap Erase iPhone to confirm.",
-      "Wait — the iPhone will restart on its own.",
+      "Wait, the iPhone will restart on its own.",
     ],
     screen: { kind: "message", title: "Erase This iPhone", body: "All content and settings will be removed.", button: "Erase iPhone", highlight: true },
     lookFor: "Erase iPhone",
@@ -115,7 +115,7 @@ const iphoneSteps: WorkflowStep[] = [
     screen: { kind: "message", title: "Hello", body: "Swipe up to open", highlight: true },
     lookFor: "Hello",
     whatNext: "Next you'll choose your language and region.",
-    nextLabel: "I see Hello — start setup",
+    nextLabel: "I see Hello, start setup",
     troubleshoot: {
       stuck: "A dark screen or Apple logo for a few minutes is normal. Keep it plugged in. If nothing changes after 10 minutes, contact Field Support.",
     },
@@ -141,7 +141,7 @@ const iphoneSteps: WorkflowStep[] = [
     screen: { kind: "list", title: "Choose a Wi-Fi Network", rows: [{ label: "Your Wi-Fi network", highlight: true }, { label: "Other network" }] },
     lookFor: "A checkmark next to your network",
     whatNext: "After Wi-Fi connects, the iPhone will ask you to sign in.",
-    nextLabel: "I'm connected — sign in",
+    nextLabel: "I'm connected, sign in",
     troubleshoot: {
       error: "Double-check the Wi-Fi password. If you're not sure which network to use, contact Field Support.",
     },
@@ -173,7 +173,7 @@ const iphoneSteps: WorkflowStep[] = [
     screen: { kind: "wait", title: "Configuring your iPhone…", body: "Sprinter Health is setting up your device." },
     why: configWhy,
     whatNext: "When it finishes, the iPhone will ask you to finish a few setup items like a passcode.",
-    nextLabel: "It finished — continue setup",
+    nextLabel: "It finished, continue setup",
     troubleshoot: {
       stuck: "This step really can take several minutes. Keep the device plugged in. If it hasn't moved after 20 minutes, contact Field Support.",
     },
@@ -219,7 +219,7 @@ const ipadMiniSteps: WorkflowStep[] = [
     lookFor: "Software Update",
     why: updateWhy,
     whatNext: "After the update finishes, you will check the software version. If IT asked for a reset, that comes after.",
-    nextLabel: "Update is done — check it",
+    nextLabel: "Update is done, check it",
   },
   {
     id: "verify-update",
@@ -230,7 +230,7 @@ const ipadMiniSteps: WorkflowStep[] = [
     screen: { kind: "list", title: "Software Update", rows: [{ label: "Automatic Updates", value: "On" }, { label: "iOS version", value: "See IT instructions", highlight: true }, { label: "Your iPad Mini is up to date" }] },
     lookFor: "The software version shown on your iPad Mini",
     why: { title: "Why check the version?", body: "The app cannot see your iPad Mini. Only you can confirm the update finished. Checking the version makes sure the next steps will work." },
-    nextLabel: "Version confirmed — continue",
+    nextLabel: "Version confirmed, continue",
   },
   {
     id: "reset",
@@ -252,7 +252,7 @@ const ipadMiniSteps: WorkflowStep[] = [
     paths: ["update-reset"],
     title: "Confirm the reset",
     intro: "The iPad will ask you to confirm. This is expected.",
-    todo: ["Tap Continue.", "Enter the iPad passcode if asked.", "Tap Erase iPad.", "Wait — the iPad restarts on its own."],
+    todo: ["Tap Continue.", "Enter the iPad passcode if asked.", "Tap Erase iPad.", "Wait, the iPad restarts on its own."],
     screen: { kind: "message", title: "Erase This iPad", body: "All content and settings will be removed.", button: "Erase iPad", highlight: true },
     lookFor: "Erase iPad",
     nextLabel: "I confirmed the reset",
@@ -266,7 +266,7 @@ const ipadMiniSteps: WorkflowStep[] = [
     todo: ["Keep the iPad plugged in.", "Wait for the Hello screen.", "Press the Home button or swipe up."],
     screen: { kind: "message", title: "Hello", body: "Press home to open", highlight: true },
     lookFor: "Hello",
-    nextLabel: "I see Hello — start setup",
+    nextLabel: "I see Hello, start setup",
   },
   {
     id: "language",
@@ -288,7 +288,7 @@ const ipadMiniSteps: WorkflowStep[] = [
     todo: ["Tap the Wi-Fi network you were told to use.", "Enter the password if asked.", "Wait for the checkmark.", "Tap Next."],
     screen: { kind: "list", title: "Choose a Wi-Fi Network", rows: [{ label: "Your Wi-Fi network", highlight: true }, { label: "Other network" }] },
     lookFor: "A checkmark next to your network",
-    nextLabel: "I'm connected — sign in",
+    nextLabel: "I'm connected, sign in",
   },
   {
     id: "account",
@@ -313,7 +313,7 @@ const ipadMiniSteps: WorkflowStep[] = [
     todo: ["Keep the iPad connected to power.", "Do not restart it unless instructed.", "Wait until the screen moves on by itself."],
     screen: { kind: "wait", title: "Configuring your iPad…", body: "Sprinter Health is setting up your device." },
     why: configWhy,
-    nextLabel: "It finished — continue setup",
+    nextLabel: "It finished, continue setup",
   },
   {
     id: "setup",
@@ -354,7 +354,7 @@ const patientIpadSteps: WorkflowStep[] = [
     screen: { kind: "list", title: "General", rows: [{ label: "About" }, { label: "Software Update", highlight: true }, { label: "AirDrop" }, { label: "iPad Storage" }] },
     lookFor: "Software Update",
     why: updateWhy,
-    nextLabel: "Update is done — check it",
+    nextLabel: "Update is done, check it",
   },
   {
     id: "verify-update",
@@ -365,7 +365,7 @@ const patientIpadSteps: WorkflowStep[] = [
     screen: { kind: "list", title: "Software Update", rows: [{ label: "Automatic Updates", value: "On" }, { label: "iOS version", value: "See IT instructions", highlight: true }, { label: "Your iPad is up to date" }] },
     lookFor: "The software version shown on your iPad",
     why: { title: "Why check the version?", body: "The app cannot see your iPad. Only you can confirm the update finished. Checking the version makes sure the next steps will work." },
-    nextLabel: "Version confirmed — continue",
+    nextLabel: "Version confirmed, continue",
   },
   {
     id: "reset",
@@ -386,7 +386,7 @@ const patientIpadSteps: WorkflowStep[] = [
     paths: ["update-reset"],
     title: "Confirm the reset",
     intro: "The iPad will ask you to confirm. This is expected.",
-    todo: ["Tap Continue.", "Enter the iPad passcode if asked.", "Tap Erase iPad.", "Wait — the iPad restarts on its own."],
+    todo: ["Tap Continue.", "Enter the iPad passcode if asked.", "Tap Erase iPad.", "Wait, the iPad restarts on its own."],
     screen: { kind: "message", title: "Erase This iPad", body: "All content and settings will be removed.", button: "Erase iPad", highlight: true },
     lookFor: "Erase iPad",
     nextLabel: "I confirmed the reset",
@@ -400,7 +400,7 @@ const patientIpadSteps: WorkflowStep[] = [
     todo: ["Keep the iPad plugged in.", "Wait for the Hello screen.", "Press the Home button or swipe up."],
     screen: { kind: "message", title: "Hello", body: "Press home to open", highlight: true },
     lookFor: "Hello",
-    nextLabel: "I see Hello — start setup",
+    nextLabel: "I see Hello, start setup",
   },
   {
     id: "language",
@@ -448,7 +448,7 @@ const patientIpadSteps: WorkflowStep[] = [
     todo: ["Keep the iPad connected to power.", "Do not restart it unless instructed.", "Wait until the screen moves on by itself."],
     screen: { kind: "wait", title: "Configuring your iPad…", body: "Sprinter Health is setting up your device." },
     why: configWhy,
-    nextLabel: "It finished — continue",
+    nextLabel: "It finished, continue",
   },
   {
     id: "auth",
@@ -469,7 +469,7 @@ const patientIpadSteps: WorkflowStep[] = [
     title: "Verify the iPad",
     intro: "Check the home screen for the patient-visit apps.",
     todo: ["Look at the home screen.", "Make sure the Sprinter Health patient apps are there.", "Open one app to make sure it starts."],
-    screen: { kind: "home", title: "Home", apps: ["Sprinter Visit", "Settings", "Safari", "Camera"] },
+    screen: { kind: "home", title: "Home", apps: ["Sprinter Health", "Settings", "Safari", "Camera"] },
     lookFor: "Your patient-visit apps",
     extras: ["testflight", "permissions"],
     nextLabel: "Everything looks right",

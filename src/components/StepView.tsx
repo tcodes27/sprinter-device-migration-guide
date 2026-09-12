@@ -234,7 +234,7 @@ export function StepView({ workflow, progress, path }: Props) {
         {!isVerify && !simDone && !isComplete && <span className="hidden text-center text-xs font-bold text-muted-foreground sm:block">Finish the practice device, or tap above if you already did this</span>}
       </div>
       <Button asChild variant="ghost" size="lg" className="max-sm:col-span-2 max-sm:mr-40 max-sm:justify-self-start max-sm:h-10">
-        <Link to="/" aria-label="Pause — progress saved">
+        <Link to="/" aria-label="Pause, progress saved">
           <PauseCircle aria-hidden /> <span>Pause<span className="hidden sm:inline"> · progress saved</span></span>
         </Link>
       </Button>
@@ -405,7 +405,7 @@ function TestFlightPanel() {
     <details className="rounded-2xl border bg-muted/40 p-4">
       <summary className="cursor-pointer text-base font-extrabold">Need help with TestFlight?</summary>
 
-      {/* Section 1 — normal install/update */}
+      {/* Section 1, normal install/update */}
       <div className="mt-4 space-y-4">
         <div className="flex items-center gap-2">
           <span className="rounded-full bg-primary px-3 py-1 text-xs font-black uppercase tracking-wider text-primary-foreground">Section 1</span>
@@ -453,7 +453,7 @@ function TestFlightPanel() {
 
       <hr className="my-6 border-border" />
 
-      {/* Section 2 — after erase */}
+      {/* Section 2, after erase */}
       <div className="space-y-4">
         <div className="flex flex-wrap items-center gap-2">
           <span className="rounded-full bg-primary/15 px-3 py-1 text-xs font-black uppercase tracking-wider text-primary">Section 2</span>
@@ -565,8 +565,8 @@ function CompletionPanel({ workflow, path }: { workflow: DeviceWorkflow; path: M
       <div className="rounded-2xl border p-4">
         <p className="text-lg font-extrabold">How is your device working? Are you having any connectivity problems?</p>
         <div className="mt-3 grid gap-2 sm:grid-cols-2">
-          <Button variant={conn === "no" ? "success" : "outline"} size="lg" onClick={() => setConn("no")}>No — everything is working</Button>
-          <Button variant={conn === "yes" ? "warning" : "outline"} size="lg" onClick={() => setConn("yes")}>Yes — I'm having problems</Button>
+          <Button variant={conn === "no" ? "success" : "outline"} size="lg" onClick={() => setConn("no")}>No, everything is working</Button>
+          <Button variant={conn === "yes" ? "warning" : "outline"} size="lg" onClick={() => setConn("yes")}>Yes. I'm having problems</Button>
         </div>
         {conn === "yes" && (
           <div className="mt-3 rounded-2xl bg-warning-soft p-4">
@@ -610,10 +610,10 @@ function AnotherDeviceDialog({ open, onOpenChange, deviceName, onYes, onNo }: { 
         </DialogHeader>
         <div className="grid gap-2 pt-2">
           <Button size="xl" onClick={onYes}>
-            Yes — choose another device <ArrowRight aria-hidden />
+            Yes, choose another device <ArrowRight aria-hidden />
           </Button>
           <Button size="xl" variant="success" onClick={onNo}>
-            No — I'm done
+            No. I'm done
           </Button>
         </div>
       </DialogContent>

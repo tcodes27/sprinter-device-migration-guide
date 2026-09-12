@@ -43,7 +43,7 @@ function Index() {
   const [chooserOpen, setChooserOpen] = useState(false);
   const [presetDevice, setPresetDevice] = useState<DeviceId | null>(null);
 
-  useSupportLocation({ deviceName: "Home — no device selected", completed: allDone, percent: Math.round((done / total) * 100) });
+  useSupportLocation({ deviceName: "Home, no device selected", completed: allDone, percent: Math.round((done / total) * 100) });
 
   useEffect(() => {
     if (choose) {
@@ -71,7 +71,7 @@ function Index() {
             <p className="text-sm font-extrabold uppercase tracking-[0.18em] text-primary">Device migration</p>
             <h1 className="mt-1 text-4xl sm:text-5xl">Let's get your devices ready.</h1>
             <p className="mt-2 text-lg text-muted-foreground">
-              Pick the device IT asked you to update. You'll follow along on a practice screen, one tap at a time — and Field Support is one tap away the whole time.{" "}
+              Pick the device IT asked you to update. You'll follow along on a practice screen, one tap at a time, and Field Support is one tap away the whole time.{" "}
               <Dialog>
                 <DialogTrigger asChild>
                   <button type="button" className="inline-flex items-center gap-1 rounded-full bg-primary-soft px-3 py-0.5 align-middle text-sm font-extrabold text-primary hover:bg-accent">

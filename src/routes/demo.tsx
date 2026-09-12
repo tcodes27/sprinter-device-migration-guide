@@ -8,16 +8,16 @@ import { progressActions, useProgress } from "@/lib/progress";
 
 const script = [
   "Tap “Choose your device”, pick a device, then answer “What did IT ask you to do?”",
-  "Choose Update + Reset — press and hold to confirm it matches the IT message",
+  "Choose Update + Reset, press and hold to confirm it matches the IT message",
   "Tap the glowing spot on the practice device to move through the screens",
-  "Tap somewhere wrong — the device wiggles and shows “Tap here”",
+  "Tap somewhere wrong, the device wiggles and shows “Tap here”",
   "Press “Watch me do it” to see it auto-play, then try it yourself",
   "Watch the sub-actions check themselves off on the right",
   "Notice the Next button fill in once the practice device is done",
   "After the update, answer the version check (try “It does not match”)",
-  "Reach the reset step — “Check one more time” gate, press and hold to confirm",
-  "Tap the floating “Need help?” — try Chat, Text, and “I can't continue” (all demo)",
-  "Tap “Pause” — progress and practice-device completion are saved",
+  "Reach the reset step, “Check one more time” gate, press and hold to confirm",
+  "Tap the floating “Need help?”, try Chat, Text, and “I can't continue” (all demo)",
+  "Tap “Pause”, progress and practice-device completion are saved",
   "Finish all steps → connectivity check → “Do you need to update another device?”",
   "Finish every device to reach the “You're all set” screen",
 ];
@@ -25,9 +25,9 @@ const script = [
 export const Route = createFileRoute("/demo")({
   head: () => ({
     meta: [
-      { title: "Demo Mode — Sprinter Health Device Migration" },
+      { title: "Demo Mode. Sprinter Health Device Migration" },
       { name: "description", content: "Internal demonstration of the Sprinter Health device migration guide using sample data." },
-      { property: "og:title", content: "Demo Mode — Sprinter Health Device Migration" },
+      { property: "og:title", content: "Demo Mode. Sprinter Health Device Migration" },
       { property: "og:description", content: "Sample-data walkthrough for internal demonstration." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

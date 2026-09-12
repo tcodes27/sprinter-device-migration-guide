@@ -37,7 +37,7 @@ export function InstructionPanel({ sequence, index, done, checked = [], onToggle
               type="button"
               role="checkbox"
               aria-checked={isDone}
-              aria-label={`${s.hint}${isDone ? " — done" : ""}`}
+              aria-label={`${s.hint}${isDone ? ", done" : ""}`}
               onClick={() => onToggle?.(i)}
               className="flex w-full items-start gap-3 rounded-2xl px-4 py-3 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             >
