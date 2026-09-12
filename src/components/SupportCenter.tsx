@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { useLocation } from "@tanstack/react-router";
+import { useRouterState } from "@tanstack/react-router";
 import {
   ArrowLeft,
   Camera,
@@ -33,7 +33,7 @@ import { cn } from "@/lib/utils";
  */
 export function SupportCenter() {
   const { isOpen, open, close, view, setView, issue, setIssue, location } = useSupport();
-  const pathname = useLocation({ select: (state) => state.pathname });
+  const pathname = useRouterState({ select: (state) => state.location.pathname });
   const [dismissedPath, setDismissedPath] = useState<string | null>(null);
   const launcherDismissed = dismissedPath === pathname;
 
