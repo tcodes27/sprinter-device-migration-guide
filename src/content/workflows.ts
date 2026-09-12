@@ -278,8 +278,8 @@ const iphoneSteps: WorkflowStep[] = [
       ],
     },
     lookFor: "Apps appearing on your home screen",
-    whatNext: "Last step: we check that your iPhone is ready.",
-    nextLabel: "Verify my iPhone",
+    whatNext: "Next, you will reinstall Sprinter Health with your original TestFlight invitation email.",
+    nextLabel: "Continue to TestFlight",
   },
   {
     id: "reinstall-sprinter-health",
@@ -552,7 +552,8 @@ const ipadMiniSteps: WorkflowStep[] = [
       ],
     },
     lookFor: "Apps appearing on your home screen",
-    nextLabel: "Verify my iPad Mini",
+    whatNext: "Next, you will reinstall Sprinter Health with your original TestFlight invitation email.",
+    nextLabel: "Continue to TestFlight",
   },
   {
     id: "reinstall-sprinter-health",
@@ -822,7 +823,8 @@ const patientIpadSteps: WorkflowStep[] = [
     },
     lookFor: "A sign-in or verification prompt",
     extras: ["authError"],
-    nextLabel: "Verify the iPad",
+    whatNext: "Next, you will reinstall Sprinter Health with the original TestFlight invitation email.",
+    nextLabel: "Continue to TestFlight",
     troubleshoot: {
       error:
         "This means the device could not complete the sign-in step. Do not keep trying random options. Contact Field Support so we can help.",

@@ -15,4 +15,4 @@
 - [x] Add a visible reset-only TestFlight reinstall step for all three devices
 - [x] Place it after setup/configuration and before final verification
 - [x] Use persistent task checkpoints and the original invitation-email process
-- [ ] Verify reset and update-only paths on desktop and mobile
+- [x] Verify reset and update-only paths on desktop and mobile
