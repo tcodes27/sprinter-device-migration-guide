@@ -18,6 +18,31 @@ export type Screen =
 
 export type StepKind = "instruction" | "waiting" | "complete";
 
+/* ---------------- Tap-along simulator model ---------------- */
+
+/** A tappable (or decorative) element on a simulated device screen. */
+export type SimItem = {
+  label: string;
+  sub?: string;
+  /** The element the Sprinter must tap to move on */
+  target?: boolean;
+  /** Red/destructive styling (e.g. "Erase iPhone") */
+  destructive?: boolean;
+  /** Show a checkmark next to it (e.g. connected Wi-Fi) */
+  checked?: boolean;
+  /** Right-side value text */
+  value?: string;
+};
+
+/** One screen in a tap sequence. Screens with a target wait for a tap; progress screens auto-advance; final screens end the sequence. */
+export type SimScreen =
+  | { kind: "home"; hint: string; apps: SimItem[] }
+  | { kind: "list"; hint: string; title: string; items: SimItem[]; back?: string; footer?: SimItem }
+  | { kind: "prompt"; hint: string; title: string; body?: string; field?: string; buttons: SimItem[] }
+  | { kind: "hello"; hint: string; label?: string }
+  | { kind: "progress"; hint: string; title: string; body?: string; durationMs: number }
+  | { kind: "final"; hint: string; title: string; body?: string; apps?: string[] };
+
 export type WorkflowStep = {
   id: string;
   kind?: StepKind;
@@ -25,9 +50,11 @@ export type WorkflowStep = {
   title: string;
   /** One calm sentence of context */
   intro: string;
-  /** What to do — short numbered actions */
+  /** What to do — short numbered actions (fallback when no sequence) */
   todo?: string[];
-  /** Illustrated example screen */
+  /** Tap-along sequence played on the practice device */
+  sequence?: SimScreen[];
+  /** Illustrated example screen (fallback) */
   screen?: Screen;
   /** "Look for:" label shown with the screen */
   lookFor?: string;
