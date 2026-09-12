@@ -189,7 +189,7 @@ export function StepView({ workflow, progress, path }: Props) {
             </Button>
           </details>
         )}
-        {step.extras?.includes("testflight") && <TestFlightPanel />}
+        {step.extras?.includes("testflightAfterErase") && <TestFlightPanel />}
         {step.extras?.includes("permissions") && <PermissionsPanel />}
 
         {isComplete && <CompletionPanel workflow={workflow} path={path} />}
@@ -374,8 +374,12 @@ function TestFlightPanel() {
   const [mode, setMode] = useState<"install" | "update" | null>(null);
   const normalSteps = mode === "install" ? testflight.install : mode === "update" ? testflight.update : null;
   return (
-    <details className="rounded-2xl border bg-muted/40 p-4">
-      <summary className="cursor-pointer text-base font-extrabold">Need help with TestFlight?</summary>
+    <section className="rounded-2xl border bg-muted/40 p-4" aria-labelledby="testflight-guide-title">
+      <div className="rounded-2xl border border-primary/20 bg-primary-soft p-4">
+        <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-primary">Required after erase</p>
+        <h2 id="testflight-guide-title" className="mt-1 text-2xl">Reinstall Sprinter Health</h2>
+        <p className="mt-2 text-base font-bold">The app disappearing after an erase is expected. Start with the original TestFlight invitation email on this device.</p>
+      </div>
 
       {/* Section 1, normal install/update */}
       <div className="mt-4 space-y-4">
@@ -487,7 +491,7 @@ function TestFlightPanel() {
           <p className="mt-2 text-base font-semibold text-muted-foreground">{testflightAfterErase.successCard.body}</p>
         </div>
       </div>
-    </details>
+    </section>
   );
 }
 

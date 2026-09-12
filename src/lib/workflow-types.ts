@@ -72,7 +72,7 @@ export type WorkflowStep = {
   /** Show the "Before you reset" confirmation gate before this step */
   resetGate?: boolean;
   /** Extra guided panels available on this step */
-  extras?: ("testflight" | "permissions" | "authError")[];
+  extras?: ("testflightAfterErase" | "permissions" | "authError")[];
   /** Optional step-specific troubleshooting answers */
   troubleshoot?: Partial<Record<TroubleChoice, string>>;
   /** Which IT-requested paths include this step. Omitted = every path. */

@@ -8,3 +8,9 @@
 - [x] Device complete → another device? dialog; /complete "You're all set" page; dashboard statuses
 - [x] TestFlight copy (full flow, install vs update, redeem-code workaround)
 - [x] Verify (typecheck, build, Playwright desktop + mobile)
+
+## Required TestFlight step after reset
+- [x] Add a visible reset-only TestFlight reinstall step for all three devices
+- [x] Place it after setup/configuration and before final verification
+- [x] Use persistent task checkpoints and the original invitation-email process
+- [ ] Verify reset and update-only paths on desktop and mobile
