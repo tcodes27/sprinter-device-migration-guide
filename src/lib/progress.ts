@@ -1,6 +1,9 @@
 import { useSyncExternalStore } from "react";
 import type { DeviceId, MigrationPath } from "./workflow-types";
 import { deviceOrder, stepsFor, workflows } from "@/content/workflows";
+import { checkpointsFor } from "./checkpoints";
+
+export type VerifyAnswer = "matches" | "noMatch" | "dontKnow";
 
 export type DeviceProgress = {
   /** What IT asked for. null = not chosen yet (the app never assumes). */
@@ -8,9 +11,11 @@ export type DeviceProgress = {
   current: number; // 0-based step index within stepsFor(workflow, path)
   completed: number[];
   gates: string[]; // step ids where the reset gate was confirmed
-  simDone: number[]; // step indexes whose tap-along sequence was finished
   verified: number[]; // step indexes where the Sprinter confirmed a version match
-  checks: Record<string, number[]>; // step id -> sub-steps the Sprinter ticked off by hand
+  /** step id -> task ids that are done (detected on the practice device, ticked by hand, or confirmed) */
+  checkpoints: Record<string, number[]>;
+  /** step id -> the answer chosen on a decision step */
+  answers: Record<string, VerifyAnswer>;
   finished: boolean;
   started: boolean;
 };
@@ -19,22 +24,51 @@ export type ProgressState = Record<DeviceId, DeviceProgress>;
 
 const KEY = "sh-migration-progress-v3";
 
-const emptyDevice = (): DeviceProgress => ({ path: null, current: 0, completed: [], gates: [], simDone: [], verified: [], checks: {}, finished: false, started: false });
+const emptyDevice = (): DeviceProgress => ({ path: null, current: 0, completed: [], gates: [], verified: [], checkpoints: {}, answers: {}, finished: false, started: false });
 const emptyState = (): ProgressState => ({ iphone: emptyDevice(), "ipad-mini": emptyDevice(), "patient-ipad": emptyDevice() });
 
 const SERVER_SNAPSHOT = emptyState();
 let state: ProgressState | null = null;
 const listeners = new Set<() => void>();
 
-function normalize(raw: Partial<ProgressState>): ProgressState {
+type LegacyDevice = Partial<DeviceProgress> & { simDone?: number[]; checks?: Record<string, number[]> };
+
+function normalize(raw: Partial<Record<DeviceId, LegacyDevice>>): ProgressState {
   const base = emptyState();
   for (const d of deviceOrder) {
-    base[d] = { ...base[d], ...(raw[d] ?? {}) };
-    if (!Array.isArray(base[d].simDone)) base[d].simDone = [];
-    if (!Array.isArray(base[d].verified)) base[d].verified = [];
-    if (!base[d].checks || typeof base[d].checks !== "object" || Array.isArray(base[d].checks)) base[d].checks = {};
+    const legacy = raw[d] ?? {};
+    const { simDone, checks, ...rest } = legacy;
+    base[d] = { ...base[d], ...rest };
+    const p = base[d];
+    if (!Array.isArray(p.verified)) p.verified = [];
+    if (!Array.isArray(p.completed)) p.completed = [];
+    if (!p.checkpoints || typeof p.checkpoints !== "object" || Array.isArray(p.checkpoints)) p.checkpoints = {};
+    if (!p.answers || typeof p.answers !== "object" || Array.isArray(p.answers)) p.answers = {};
+    // Migrate older saves: hand-ticked boxes and finished practice devices become checkpoints.
+    if (checks && typeof checks === "object") {
+      for (const [id, list] of Object.entries(checks)) if (Array.isArray(list)) p.checkpoints[id] = union(p.checkpoints[id] ?? [], list);
+    }
+    const steps = stepsFor(workflows[d], p.path ?? "update-reset");
+    const fullyDone = new Set<number>([...(Array.isArray(simDone) ? simDone : []), ...p.completed]);
+    for (const i of fullyDone) {
+      const step = steps[i];
+      if (!step) continue;
+      const all = checkpointsFor(step).map((c) => c.id);
+      p.checkpoints[step.id] = union(p.checkpoints[step.id] ?? [], all);
+    }
+    for (const i of p.verified) {
+      const step = steps[i];
+      if (step) {
+        p.checkpoints[step.id] = union(p.checkpoints[step.id] ?? [], [0]);
+        p.answers[step.id] = p.answers[step.id] ?? "matches";
+      }
+    }
   }
   return base;
+}
+
+function union(a: number[], b: number[]) {
+  return Array.from(new Set([...a, ...b])).sort((x, y) => x - y);
 }
 
 function load(): ProgressState {
