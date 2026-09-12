@@ -11,7 +11,7 @@ type Props = {
   onOpenChange: (open: boolean) => void;
   title?: string;
   question?: string;
-  answers?: Partial<Record<TroubleChoice, string>>;
+  answers?: Partial<Record<TroubleChoice, string>> | undefined;
 };
 
 export function TroubleshootDialog({ open, onOpenChange, title = "That's okay — let's figure it out.", question = "What looks different?", answers }: Props) {

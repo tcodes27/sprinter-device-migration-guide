@@ -10,7 +10,7 @@ import type { TroubleChoice } from "@/lib/workflow-types";
 type Props = {
   /** Where the user is right now, e.g. "Step 4 — Erase & Reset iPhone" */
   location?: string;
-  answers?: Partial<Record<TroubleChoice, string>>;
+  answers?: Partial<Record<TroubleChoice, string>> | undefined;
 };
 
 type Option = { label: string; answer?: string; action?: "different" | "contact" | "connectivity" };
