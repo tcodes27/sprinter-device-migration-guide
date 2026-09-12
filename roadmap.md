@@ -37,4 +37,4 @@
 - [x] Align and tighten the floating Help control across screen sizes
 - [x] Add a separate accessible dismiss action
 - [x] Restore the floating control after page navigation
-- [ ] Verify dismissal, navigation reset, and responsive presentation
+- [x] Verify dismissal, navigation reset, and responsive presentation
