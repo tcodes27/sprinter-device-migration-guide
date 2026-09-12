@@ -1,38 +1,32 @@
-# Proof of Completion: confirmation codes + screenshot upload
+# Proof of Completion: confirmation codes (no screenshots, no transmission)
 
-Right now the finish screen just says "You're all set". Nothing gives Field Support proof they can close the ticket with. I recommend doing both, because they serve different purposes:
-
-- A **confirmation code** is what the Sprinter sends back in the ticket reply. It is short, typo-resistant, and unique per person.
-- A **screenshot of the finished device** is the visual proof that the app actually opened and is signed in.
+Right now the finish screen just says "You're all set". Field Support has no clear signal that a Sprinter is done. Per your direction: confirmation codes only. Field Support will verify in the IRU database and close the ticket, so nothing needs to be transmitted and no screenshot upload is needed.
 
 ## What the Sprinter will see
 
-**On each device's final screen (after the last step)**
+**On each device's final screen (after the last step is checked)**
 
-1. A "Send proof to Field Support" card appears once every task on that device is checked.
-2. A device confirmation code, e.g. `IPH-4K7Q-2026` (device prefix, short random block, year). Big, easy to read, with a "Copy code" button.
-3. An "Add a photo or screenshot of the finished app screen" button. They pick an image from the device; a thumbnail shows with a green check. It is stored on the device only in this prototype, nothing is uploaded anywhere.
-4. Plain instruction: "Reply to your Field Support ticket with this code and photo."
+1. A green "Device complete" card appears with a **device confirmation code**, e.g. `IPH-4K7Q-2026` (device prefix, short random block, year). Big, easy to read.
+2. A "Copy code" button.
+3. Plain instruction: "Copy this confirmation code and send it in your reply to Field Support. This lets them know your device is finished."
 
 **On the "You're all set" screen**
 
-1. One **master completion code** covering the whole migration, e.g. `SH-2026-8FQ3-XR21`. This is the single number Field Support can close the ticket against.
-2. A summary list: each device, its own code, whether a photo was attached, and the date/time it was finished.
-3. Buttons: **Copy completion summary** (copies a clean block of text they can paste straight into an email or ticket reply) and **Send to Field Support** (opens the existing Field Support request panel with the summary pre-filled, still marked Demo / Prototype).
-4. Codes and photos survive a refresh; they are generated once and never change for that migration.
-
-If a device is not finished yet, its row shows "Not finished yet" instead of a code, so nobody sends a half-done confirmation.
+1. One **master completion code** covering the whole migration, e.g. `SH-8FQ3-XR21-2026`, generated once all devices are finished. This is the single code Field Support closes the ticket against after checking the IRU database.
+2. A summary list: each device name, its own code, and the date/time it was finished. Unfinished devices show "Not finished yet" instead of a code, so nobody sends a half-done confirmation.
+3. A **Copy completion summary** button: copies a clean block of text (master code + per-device codes + finish dates) they can paste straight into their ticket reply.
+4. Clear framing text: "Send this code in your reply to Field Support. They will confirm everything is recorded and close your ticket."
+5. Codes are generated once and never change; they survive refresh, leaving, and returning.
 
 ## Prototype honesty
 
-Nothing is actually transmitted. Every send action keeps the existing "Demo / Prototype" badge and the note that no message is sent. Codes are generated on the device and saved locally.
+Nothing is transmitted and nothing is validated against a real system. The existing "Demo / Prototype" badge stays on all support surfaces. Codes exist only so the Sprinter has something concrete to send back, and so the experience matches the future flow where Field Support checks the IRU database.
 
 ## Technical notes
 
-- `src/lib/progress.ts`: add per-device `confirmationCode`, `completedAt`, `photoName`/`photoDataUrl`, plus a state-level `masterCode`. Generated lazily on first completion, persisted in the existing localStorage save; `normalize()` keeps older saves working (missing fields default to empty).
-- New `src/lib/confirmation.ts`: code generation (device prefix + crypto-random base32 block), master code, and a `summaryText()` formatter used by copy and by the pre-filled support request.
-- New `src/components/ProofOfCompletion.tsx`: the reusable card (code, copy button, photo picker via a hidden `<input type="file" accept="image/*">`, thumbnail). Used on the device final step and on `/complete`.
+- `src/lib/progress.ts`: add per-device `confirmationCode` and `completedAt`, plus a state-level `masterCode`. Codes generated lazily the first time a device (or the whole migration) finishes, persisted in the existing localStorage save; `normalize()` defaults missing fields for older saves.
+- New `src/lib/confirmation.ts`: code generation (crypto-random, no confusing characters like O/0 or I/1) and a `summaryText()` formatter for the copy button.
+- New `src/components/ConfirmationCode.tsx`: reusable card (code display + copy button with "Copied" feedback + instruction text). Used on the device final step and on `/complete`.
 - `src/components/StepView.tsx`: render the card on the final step once all checkpoints are complete.
-- `src/routes/complete.tsx`: master code, per-device summary table, copy button, and a Field Support hand-off that calls the existing `useSupport().open()` with the summary as the issue/message.
-- Photos are downscaled to a small JPEG data URL before saving so localStorage does not blow past its quota.
-- No backend, no Cloud, no network calls.
+- `src/routes/complete.tsx`: master code, per-device code list, copy-summary button, and framing copy.
+- No backend, no Cloud, no uploads, no network calls.
