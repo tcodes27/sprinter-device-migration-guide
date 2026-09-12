@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { useRouterState } from "@tanstack/react-router";
+import { useRouter } from "@tanstack/react-router";
 import {
   ArrowLeft,
   Camera,
@@ -33,9 +33,12 @@ import { cn } from "@/lib/utils";
  */
 export function SupportCenter() {
   const { isOpen, open, close, view, setView, issue, setIssue, location } = useSupport();
-  const pathname = useRouterState({ select: (state) => state.location.pathname });
-  const [dismissedPath, setDismissedPath] = useState<string | null>(null);
-  const launcherDismissed = dismissedPath === pathname;
+  const router = useRouter();
+  const [launcherDismissed, setLauncherDismissed] = useState(false);
+
+  useEffect(() => {
+    return router.subscribe("onResolved", () => setLauncherDismissed(false));
+  }, [router]);
 
   const titleFor: Record<SupportView, string> = {
     menu: "Need help?",
@@ -70,7 +73,7 @@ export function SupportCenter() {
             <Button
               type="button"
               size="icon"
-              onClick={() => setDismissedPath(pathname)}
+              onClick={() => setLauncherDismissed(true)}
               className="h-auto min-h-12 w-11 rounded-none rounded-r-full border-l border-primary-foreground/30 px-0 shadow-none sm:min-h-14 sm:w-12"
               aria-label="Hide floating Help button on this page"
             >
