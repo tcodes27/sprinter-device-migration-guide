@@ -10,6 +10,7 @@ export type DeviceProgress = {
   gates: string[]; // step ids where the reset gate was confirmed
   simDone: number[]; // step indexes whose tap-along sequence was finished
   verified: number[]; // step indexes where the Sprinter confirmed a version match
+  checks: Record<string, number[]>; // step id -> sub-steps the Sprinter ticked off by hand
   finished: boolean;
   started: boolean;
 };
@@ -18,7 +19,7 @@ export type ProgressState = Record<DeviceId, DeviceProgress>;
 
 const KEY = "sh-migration-progress-v3";
 
-const emptyDevice = (): DeviceProgress => ({ path: null, current: 0, completed: [], gates: [], simDone: [], verified: [], finished: false, started: false });
+const emptyDevice = (): DeviceProgress => ({ path: null, current: 0, completed: [], gates: [], simDone: [], verified: [], checks: {}, finished: false, started: false });
 const emptyState = (): ProgressState => ({ iphone: emptyDevice(), "ipad-mini": emptyDevice(), "patient-ipad": emptyDevice() });
 
 const SERVER_SNAPSHOT = emptyState();
@@ -31,6 +32,7 @@ function normalize(raw: Partial<ProgressState>): ProgressState {
     base[d] = { ...base[d], ...(raw[d] ?? {}) };
     if (!Array.isArray(base[d].simDone)) base[d].simDone = [];
     if (!Array.isArray(base[d].verified)) base[d].verified = [];
+    if (!base[d].checks || typeof base[d].checks !== "object" || Array.isArray(base[d].checks)) base[d].checks = {};
   }
   return base;
 }
@@ -99,6 +101,13 @@ export const progressActions = {
   markVerified(device: DeviceId, index: number) {
     update(device, (d) => (d.verified.includes(index) ? d : { ...d, verified: [...d.verified, index] }));
   },
+  toggleCheck(device: DeviceId, stepId: string, item: number) {
+    update(device, (d) => {
+      const list = d.checks[stepId] ?? [];
+      const next = list.includes(item) ? list.filter((i) => i !== item) : [...list, item];
+      return { ...d, checks: { ...d.checks, [stepId]: next } };
+    });
+  },
   confirmGate(device: DeviceId, stepId: string) {
     update(device, (d) => ({ ...d, gates: d.gates.includes(stepId) ? d.gates : [...d.gates, stepId] }));
   },
@@ -112,7 +121,7 @@ export const progressActions = {
     const s = emptyState();
     const total = stepsFor(workflows.iphone, "update-reset").length;
     const all = Array.from({ length: total }, (_, i) => i);
-    s.iphone = { path: "update-reset", current: total - 1, completed: all, simDone: all, verified: [1], gates: ["reset"], finished: true, started: true };
+    s.iphone = { path: "update-reset", current: total - 1, completed: all, simDone: all, verified: [1], checks: {}, gates: ["reset"], finished: true, started: true };
     s["ipad-mini"] = { ...emptyDevice(), path: "update", started: true };
     s["patient-ipad"] = { ...emptyDevice(), path: "update-reset", current: 1, completed: [0], simDone: [0], started: true };
     save(s);

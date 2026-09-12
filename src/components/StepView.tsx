@@ -4,7 +4,7 @@ import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { ArrowLeft, ArrowRight, Check, CircleHelp, Expand, Headset, Info, OctagonAlert, PauseCircle, ShieldAlert, Sparkles, TriangleAlert } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Popover, PopoverClose, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { DeviceScreen } from "./DeviceScreen";
 import { DeviceSimulator, type SimPhase } from "./DeviceSimulator";
 import { InstructionPanel } from "./InstructionPanel";
@@ -69,6 +69,8 @@ export function StepView({ workflow, progress, path }: Props) {
     const i = steps.findIndex((s) => s.id === "update");
     progressActions.goTo(workflow.id, Math.max(0, i));
   };
+  const stepChecks = progress.checks?.[step.id] ?? [];
+  const toggleCheck = useCallback((i: number) => progressActions.toggleCheck(workflow.id, step.id, i), [workflow.id, step.id]);
   const onSimComplete = useCallback(() => progressActions.markSimDone(workflow.id, index), [workflow.id, index]);
   const onSimProgress = useCallback((i: number, phase: SimPhase) => setSim({ index: i, phase }), []);
 
@@ -166,15 +168,14 @@ export function StepView({ workflow, progress, path }: Props) {
         ) : step.sequence ? (
           <div>
             <h2 className="mb-3 text-sm font-extrabold uppercase tracking-[0.18em] text-muted-foreground">What to do</h2>
-            <InstructionPanel sequence={step.sequence} index={sim.index} done={simDone} />
+            <InstructionPanel sequence={step.sequence} index={sim.index} done={simDone} checked={stepChecks} onToggle={toggleCheck} />
           </div>
         ) : (
           step.todo && (
             <ol className="space-y-3">
               {step.todo.map((t, i) => (
-                <li key={t} className="flex items-start gap-3 text-lg font-semibold">
-                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary-soft text-base font-black text-primary">{i + 1}</span>
-                  <span className="pt-0.5">{t}</span>
+                <li key={t}>
+                  <TodoCheckItem label={t} number={i + 1} checked={stepChecks.includes(i)} onToggle={() => toggleCheck(i)} />
                 </li>
               ))}
             </ol>
@@ -278,13 +279,44 @@ function WhyPopover({ title, body, label = "Why?", icon = "why" }: { title: stri
       <PopoverContent className="w-80 rounded-2xl p-5 shadow-float" align="start">
         <h3 className="text-lg">{title}</h3>
         <p className="mt-2 text-base font-semibold text-muted-foreground">{body}</p>
-        <PopoverTrigger asChild>
+        <PopoverClose asChild>
           <Button size="lg" className="mt-4 w-full">
             Got it
           </Button>
-        </PopoverTrigger>
+        </PopoverClose>
       </PopoverContent>
     </Popover>
+  );
+}
+
+function TodoCheckItem({ label, number, checked, onToggle }: { label: string; number: number; checked: boolean; onToggle: () => void }) {
+  return (
+    <button
+      type="button"
+      role="checkbox"
+      aria-checked={checked}
+      onClick={onToggle}
+      className={cn(
+        "flex w-full items-start gap-3 rounded-2xl border px-3 py-2 text-left transition-colors",
+        checked ? "border-success/30 bg-success-soft/60" : "border-transparent hover:bg-muted/60",
+      )}
+    >
+      <span
+        className={cn(
+          "mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-xl border-2 text-base font-black transition-colors",
+          checked ? "border-success bg-success text-success-foreground" : "border-primary/30 bg-card text-primary",
+        )}
+      >
+        {checked ? (
+          <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+            <path d="M5 12.5l4.5 4.5L19 7" className="draw-check" />
+          </svg>
+        ) : (
+          number
+        )}
+      </span>
+      <span className={cn("pt-1 text-lg font-semibold", checked && "text-muted-foreground line-through decoration-success/60")}>{label}</span>
+    </button>
   );
 }
 
