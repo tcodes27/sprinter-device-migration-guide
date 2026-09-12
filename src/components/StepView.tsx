@@ -13,7 +13,7 @@ import { HoldToConfirm } from "./HoldToConfirm";
 import { TroubleshootDialog } from "./TroubleshootDialog";
 import { VersionCheck } from "./VersionCheck";
 import { Logo } from "./Logo";
-import { authErrorHelp, permissions, resetWarning, supportMessage, testflight } from "@/content/shared";
+import { authErrorHelp, permissions, resetWarning, supportMessage, testflight, testflightAfterErase } from "@/content/shared";
 import { phasesFor, stepsFor } from "@/content/workflows";
 import { pathLabels, type DeviceWorkflow, type MigrationPath, type WorkflowStep } from "@/lib/workflow-types";
 import { percent, progressActions, type DeviceProgress } from "@/lib/progress";
@@ -368,46 +368,119 @@ function ResetGate({ workflow, index, total, onConfirm, onBack, onHelp }: { work
 function TestFlightPanel() {
   const { open } = useSupport();
   const [mode, setMode] = useState<"install" | "update" | null>(null);
-  const steps = mode === "install" ? testflight.install : mode === "update" ? testflight.update : null;
+  const normalSteps = mode === "install" ? testflight.install : mode === "update" ? testflight.update : null;
   return (
     <details className="rounded-2xl border bg-muted/40 p-4">
-      <summary className="cursor-pointer text-base font-extrabold">Need to install or update the Sprinter Health app?</summary>
-      <p className="mt-2 text-base font-semibold text-muted-foreground">{testflight.what}</p>
-      <p className="mt-2 rounded-2xl bg-primary-soft p-3 text-sm font-bold">{testflight.rule}</p>
-      <div className="mt-3 grid gap-2 sm:grid-cols-2">
-        <Button variant={mode === "install" ? "default" : "outline"} size="lg" onClick={() => setMode("install")}>
-          Install app
-        </Button>
-        <Button variant={mode === "update" ? "default" : "outline"} size="lg" onClick={() => setMode("update")}>
-          Update app
-        </Button>
+      <summary className="cursor-pointer text-base font-extrabold">Need help with TestFlight?</summary>
+
+      {/* Section 1 — normal install/update */}
+      <div className="mt-4 space-y-4">
+        <div className="flex items-center gap-2">
+          <span className="rounded-full bg-primary px-3 py-1 text-xs font-black uppercase tracking-wider text-primary-foreground">Section 1</span>
+          <span className="text-base font-extrabold">Install or Update Sprinter Health</span>
+        </div>
+        <p className="text-base font-semibold text-muted-foreground">{testflight.what}</p>
+        <p className="rounded-2xl bg-primary-soft p-3 text-sm font-bold">{testflight.rule}</p>
+        <div className="grid gap-2 sm:grid-cols-2">
+          <Button variant={mode === "install" ? "default" : "outline"} size="lg" onClick={() => setMode("install")}>
+            Install app
+          </Button>
+          <Button variant={mode === "update" ? "default" : "outline"} size="lg" onClick={() => setMode("update")}>
+            Update app
+          </Button>
+        </div>
+        {normalSteps && (
+          <ol className="space-y-2">
+            {normalSteps.map((s, i) => (
+              <li key={s} className="flex gap-3 text-base font-semibold">
+                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary-soft text-sm font-black text-primary">{i + 1}</span>
+                {s}
+              </li>
+            ))}
+          </ol>
+        )}
+        <p className="flex gap-2 text-sm font-semibold text-muted-foreground">
+          <Info className="mt-0.5 h-4 w-4 shrink-0" aria-hidden /> {testflight.installVsUpdate}
+        </p>
+        <div className="rounded-2xl border border-warning/40 bg-warning-soft p-4">
+          <p className="text-base font-extrabold">{testflight.redeemCode.title}</p>
+          <p className="text-base font-semibold">{testflight.redeemCode.warning}</p>
+          <ol className="mt-2 list-decimal space-y-1 pl-5 text-base font-semibold">
+            {testflight.redeemCode.steps.map((s) => (
+              <li key={s}>{s}</li>
+            ))}
+          </ol>
+          <div className="mt-3 flex flex-wrap items-center gap-2">
+            <span className="text-sm font-extrabold">{testflight.redeemCode.still}</span>
+            <Button size="sm" onClick={() => open({ view: "request", issue: "TestFlight / redeem code problem" })}>
+              <Headset aria-hidden /> Contact Field Support
+            </Button>
+          </div>
+        </div>
       </div>
-      {steps && (
-        <ol className="mt-4 space-y-2">
-          {steps.map((s, i) => (
-            <li key={s} className="flex gap-3 text-base font-semibold">
-              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary-soft text-sm font-black text-primary">{i + 1}</span>
-              {s}
+
+      <hr className="my-6 border-border" />
+
+      {/* Section 2 — after erase */}
+      <div className="space-y-4">
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="rounded-full bg-primary/15 px-3 py-1 text-xs font-black uppercase tracking-wider text-primary">Section 2</span>
+          <span className="text-base font-extrabold">{testflightAfterErase.title}</span>
+        </div>
+        <p className="rounded-2xl bg-primary-soft p-4 text-base font-bold">{testflightAfterErase.intro}</p>
+
+        <ol className="space-y-4">
+          {testflightAfterErase.steps.map((s, i) => (
+            <li key={s.title} className="rounded-2xl bg-card p-4 shadow-soft">
+              <div className="flex items-start gap-3">
+                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary-soft text-sm font-black text-primary">{i + 1}</span>
+                <div className="min-w-0 flex-1 space-y-2">
+                  <p className="text-lg font-extrabold">{s.title}</p>
+                  <p className="text-base font-semibold text-muted-foreground">{s.body}</p>
+                  {s.note && <p className="rounded-xl bg-muted p-3 text-sm font-bold text-foreground">{s.note}</p>}
+                  {s.warning && (
+                    <p className="flex gap-2 rounded-xl border border-warning/30 bg-warning-soft p-3 text-sm font-bold text-foreground">
+                      <TriangleAlert className="mt-0.5 h-4 w-4 shrink-0 text-warning-foreground" aria-hidden /> {s.warning}
+                    </p>
+                  )}
+                  {s.important && (
+                    <p className="flex gap-2 rounded-xl border border-primary/20 bg-primary-soft p-3 text-sm font-bold text-foreground">
+                      <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden /> {s.important}
+                    </p>
+                  )}
+                </div>
+              </div>
             </li>
           ))}
         </ol>
-      )}
-      <p className="mt-3 flex gap-2 text-sm font-semibold text-muted-foreground">
-        <Info className="mt-0.5 h-4 w-4 shrink-0" aria-hidden /> {testflight.installVsUpdate}
-      </p>
-      <div className="mt-4 rounded-2xl border border-warning/40 bg-warning-soft p-4">
-        <p className="text-base font-extrabold">{testflight.redeemCode.title}</p>
-        <p className="text-base font-semibold">{testflight.redeemCode.warning}</p>
-        <ol className="mt-2 list-decimal space-y-1 pl-5 text-base font-semibold">
-          {testflight.redeemCode.steps.map((s) => (
-            <li key={s}>{s}</li>
-          ))}
-        </ol>
-        <div className="mt-3 flex flex-wrap items-center gap-2">
-          <span className="text-sm font-extrabold">{testflight.redeemCode.still}</span>
-          <Button size="sm" onClick={() => open({ view: "request", issue: "TestFlight / redeem code problem" })}>
-            <Headset aria-hidden /> Contact Field Support
-          </Button>
+
+        {/* Error card */}
+        <div className="rounded-2xl border border-warning/40 bg-warning-soft p-4">
+          <p className="flex items-center gap-2 text-lg font-extrabold text-foreground">
+            <TriangleAlert className="h-5 w-5 text-warning-foreground" aria-hidden /> {testflightAfterErase.errorCard.title}
+          </p>
+          <ul className="mt-3 space-y-2">
+            {testflightAfterErase.errorCard.bullets.map((b) => (
+              <li key={b} className="flex gap-2 text-base font-semibold">
+                <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-warning-foreground" aria-hidden />
+                <span>{b}</span>
+              </li>
+            ))}
+          </ul>
+          <div className="mt-4 flex flex-wrap items-center gap-2">
+            <span className="text-sm font-extrabold">Still need help?</span>
+            <Button size="sm" onClick={() => open({ view: "request", issue: "TestFlight reinstall after erase" })}>
+              <Headset aria-hidden /> Contact Field Support
+            </Button>
+          </div>
+        </div>
+
+        {/* Success card */}
+        <div className="rounded-2xl border border-success/30 bg-success-soft p-5">
+          <p className="flex items-center gap-2 text-xl font-black text-foreground">
+            <Check className="h-6 w-6 text-success" aria-hidden /> {testflightAfterErase.successCard.title}
+          </p>
+          <p className="mt-2 text-base font-semibold text-muted-foreground">{testflightAfterErase.successCard.body}</p>
         </div>
       </div>
     </details>
