@@ -13,7 +13,7 @@ import { HoldToConfirm } from "./HoldToConfirm";
 import { TroubleshootDialog } from "./TroubleshootDialog";
 import { VersionCheck } from "./VersionCheck";
 import { Logo } from "./Logo";
-import { authErrorHelp, permissions, resetWarning, supportMessage, testflight } from "@/content/shared";
+import { authErrorHelp, permissions, resetWarning, supportMessage, testflight, testflightAfterErase } from "@/content/shared";
 import { phasesFor, stepsFor } from "@/content/workflows";
 import { pathLabels, type DeviceWorkflow, type MigrationPath, type WorkflowStep } from "@/lib/workflow-types";
 import { percent, progressActions, type DeviceProgress } from "@/lib/progress";
