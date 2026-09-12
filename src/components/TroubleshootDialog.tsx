@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { Link } from "@tanstack/react-router";
 import { ArrowLeft, OctagonAlert } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { defaultTroubleAnswers, troubleChoices } from "@/content/shared";
+import { useSupport } from "@/lib/support";
 import type { TroubleChoice } from "@/lib/workflow-types";
 
 type Props = {
@@ -16,6 +16,7 @@ type Props = {
 
 export function TroubleshootDialog({ open, onOpenChange, title = "That's okay â€” let's figure it out.", question = "What looks different?", answers }: Props) {
   const [choice, setChoice] = useState<TroubleChoice | null>(null);
+  const { open: openSupport } = useSupport();
   const merged = { ...defaultTroubleAnswers, ...answers };
   const stopHere = choice === "error" || choice === "other";
 
@@ -51,8 +52,15 @@ export function TroubleshootDialog({ open, onOpenChange, title = "That's okay â€
               </div>
             )}
             <div className="grid gap-2">
-              <Button asChild size="xl" variant={stopHere ? "default" : "outline"}>
-                <Link to="/help">Contact Field Support</Link>
+              <Button
+                size="xl"
+                variant={stopHere ? "default" : "outline"}
+                onClick={() => {
+                  onOpenChange(false);
+                  openSupport({ view: "request", issue: troubleChoices.find((c) => c.id === choice)?.label ?? "My screen looks different" });
+                }}
+              >
+                Contact Field Support
               </Button>
               <Button variant="ghost" size="lg" onClick={() => setChoice(null)}>
                 <ArrowLeft aria-hidden /> Pick a different answer
