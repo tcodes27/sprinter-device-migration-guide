@@ -16,3 +16,9 @@
 - [x] Place it after setup/configuration and before final verification
 - [x] Use persistent task checkpoints and the original invitation-email process
 - [x] Verify reset and update-only paths on desktop and mobile
+
+## Proof of completion
+
+- [x] Per-device confirmation codes issued on finish, persisted across refresh
+- [x] Master completion code + copyable summary on "You're all set" for the Field Support ticket reply
+- [ ] Verify in browser (codes appear, copy works, refresh keeps them)
