@@ -154,13 +154,23 @@ export function StepView({ workflow, progress, path }: Props) {
     <div className="space-y-4">
       {demo}
       {hasDemo && (
-        <div className="grid gap-2 border-t pt-4 sm:grid-cols-2">
-          <Button variant="soft" size="sm" onClick={() => setLightbox(true)}>
-            <Expand aria-hidden /> Show me bigger
+        <div className="grid gap-2 border-t pt-4">
+          <Button
+            variant="soft"
+            size="sm"
+            className="h-auto min-h-10 whitespace-normal py-2"
+            onClick={() => setLightbox(true)}
+          >
+            <Expand className="shrink-0" aria-hidden /> Show me bigger
           </Button>
           {!isComplete && (
-            <Button variant="outline" size="sm" onClick={() => setDifferent(true)}>
-              <TriangleAlert aria-hidden /> My screen looks different
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-auto min-h-10 whitespace-normal py-2"
+              onClick={() => setDifferent(true)}
+            >
+              <TriangleAlert className="shrink-0" aria-hidden /> My screen looks different
             </Button>
           )}
         </div>
