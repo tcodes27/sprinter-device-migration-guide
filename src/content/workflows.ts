@@ -1,4 +1,4 @@
-import type { DeviceId, DeviceWorkflow, WorkflowStep } from "@/lib/workflow-types";
+import type { DeviceId, DeviceWorkflow, MigrationPath, WorkflowStep } from "@/lib/workflow-types";
 import { buildSequences, deviceCopy } from "./sequences";
 
 /* ------------------------------------------------------------------ */
@@ -27,8 +27,9 @@ const configWhy = {
 const iphoneSteps: WorkflowStep[] = [
   {
     id: "update",
+    phase: "Update",
     title: "Update your iPhone",
-    intro: "Before we reset your iPhone, update it first.",
+    intro: "Update your iPhone first. Whatever IT asked you to do, this comes first.",
     todo: [
       "Open Settings.",
       "Tap General.",
@@ -43,11 +44,24 @@ const iphoneSteps: WorkflowStep[] = [
     },
     lookFor: "Software Update",
     why: updateWhy,
-    whatNext: "After the update finishes, you will erase the iPhone and set it up again. This is expected.",
-    nextLabel: "Update is done — start reset",
+    whatNext: "After the update finishes, you will check the software version. If IT asked for a reset, that comes after.",
+    nextLabel: "Update is done — check it",
+  },
+  {
+    id: "verify-update",
+    phase: "Verify",
+    kind: "verify-version",
+    title: "Update complete?",
+    intro: "Let's make sure your iPhone finished updating.",
+    screen: { kind: "list", title: "Software Update", rows: [{ label: "Automatic Updates", value: "On" }, { label: "iOS version", value: "See IT instructions", highlight: true }, { label: "Your iPhone is up to date" }] },
+    lookFor: "The software version shown on your iPhone",
+    why: { title: "Why check the version?", body: "The app cannot see your iPhone. Only you can confirm the update finished. Checking the version makes sure the next steps will work." },
+    nextLabel: "Version confirmed — continue",
   },
   {
     id: "reset",
+    phase: "Reset",
+    paths: ["update-reset"],
     title: "Erase & reset your iPhone",
     intro: "Now we erase the iPhone so it can join the new system.",
     resetGate: true,
@@ -73,6 +87,8 @@ const iphoneSteps: WorkflowStep[] = [
   },
   {
     id: "confirm-reset",
+    phase: "Reset",
+    paths: ["update-reset"],
     title: "Confirm the reset",
     intro: "The iPhone will ask you to confirm. This is expected.",
     todo: [
@@ -91,6 +107,8 @@ const iphoneSteps: WorkflowStep[] = [
   },
   {
     id: "hello",
+    phase: "Setup",
+    paths: ["update-reset"],
     title: "Wait for the Hello screen",
     intro: "After the iPhone restarts, you'll see a screen that says Hello.",
     todo: ["Keep the iPhone plugged in.", "Wait for the Hello screen.", "Swipe up or press Home to begin."],
@@ -104,6 +122,8 @@ const iphoneSteps: WorkflowStep[] = [
   },
   {
     id: "language",
+    phase: "Setup",
+    paths: ["update-reset"],
     title: "Choose language & region",
     intro: "Pick your language and country.",
     todo: ["Tap English (or your language).", "Tap United States (or your region).", "Tap Continue if asked."],
@@ -113,6 +133,8 @@ const iphoneSteps: WorkflowStep[] = [
   },
   {
     id: "wifi",
+    phase: "Setup",
+    paths: ["update-reset"],
     title: "Connect to Wi-Fi",
     intro: "The iPhone needs Wi-Fi for the next steps.",
     todo: ["Tap the Wi-Fi network you were told to use.", "Enter the Wi-Fi password if asked.", "Wait for the checkmark.", "Tap Next."],
@@ -126,6 +148,8 @@ const iphoneSteps: WorkflowStep[] = [
   },
   {
     id: "signin",
+    phase: "Setup",
+    paths: ["update-reset"],
     title: "Sign in with your Sprinter Health email",
     intro: "Use the Sprinter Health account IT gave you.",
     todo: ["Enter your Sprinter Health email address.", "Tap Next.", "Enter your password.", "Complete any sign-in prompt you normally use."],
@@ -140,6 +164,8 @@ const iphoneSteps: WorkflowStep[] = [
   },
   {
     id: "configure",
+    phase: "Configure",
+    paths: ["update-reset"],
     kind: "waiting",
     title: "Device configuration",
     intro: "Your device is being configured. This may take several minutes.",
@@ -154,6 +180,8 @@ const iphoneSteps: WorkflowStep[] = [
   },
   {
     id: "setup",
+    phase: "Configure",
+    paths: ["update-reset"],
     title: "Continue setup",
     intro: "Follow the on-screen instructions. You may be asked for a few things.",
     todo: ["Create a passcode if asked.", "Set up Face ID if asked.", "Set up your authenticator app if asked.", "Wait for apps to install."],
@@ -165,6 +193,7 @@ const iphoneSteps: WorkflowStep[] = [
   },
   {
     id: "verify",
+    phase: "Verify",
     kind: "complete",
     title: "You're all set",
     intro: "Check your home screen. You should see your expected Sprinter Health apps.",
@@ -182,19 +211,33 @@ const iphoneSteps: WorkflowStep[] = [
 const ipadMiniSteps: WorkflowStep[] = [
   {
     id: "update",
+    phase: "Update",
     title: "Update your iPad Mini",
     intro: "Before anything else, update the iPad Mini.",
     todo: ["Open Settings on the iPad.", "Tap General in the left column.", "Tap Software Update.", "If an update is available, tap Download and Install.", "Wait for the update to finish."],
     screen: { kind: "list", title: "General", rows: [{ label: "About" }, { label: "Software Update", highlight: true }, { label: "AirDrop" }, { label: "iPad Storage" }] },
     lookFor: "Software Update",
     why: updateWhy,
-    whatNext: "If IT asked you to reset this iPad, you'll do that next. If not, you'll skip ahead.",
-    nextLabel: "Update is done",
+    whatNext: "After the update finishes, you will check the software version. If IT asked for a reset, that comes after.",
+    nextLabel: "Update is done — check it",
+  },
+  {
+    id: "verify-update",
+    phase: "Verify",
+    kind: "verify-version",
+    title: "Update complete?",
+    intro: "Let's make sure your iPad Mini finished updating.",
+    screen: { kind: "list", title: "Software Update", rows: [{ label: "Automatic Updates", value: "On" }, { label: "iOS version", value: "See IT instructions", highlight: true }, { label: "Your iPad Mini is up to date" }] },
+    lookFor: "The software version shown on your iPad Mini",
+    why: { title: "Why check the version?", body: "The app cannot see your iPad Mini. Only you can confirm the update finished. Checking the version makes sure the next steps will work." },
+    nextLabel: "Version confirmed — continue",
   },
   {
     id: "reset",
-    title: "Reset your iPad Mini (if required)",
-    intro: "Only do this if IT asked you to reset this iPad.",
+    phase: "Reset",
+    paths: ["update-reset"],
+    title: "Erase & reset your iPad Mini",
+    intro: "IT asked for Update + Reset. Now we erase the iPad so it can join the new system.",
     resetGate: true,
     todo: ["Open Settings.", "Tap General.", "Scroll down and tap Transfer or Reset iPad.", "Tap Erase All Content and Settings.", "Follow the prompts."],
     screen: { kind: "list", title: "Transfer or Reset iPad", rows: [{ label: "Prepare for New iPad" }, { label: "Reset" }, { label: "Erase All Content and Settings", highlight: true }] },
@@ -205,6 +248,8 @@ const ipadMiniSteps: WorkflowStep[] = [
   },
   {
     id: "confirm-reset",
+    phase: "Reset",
+    paths: ["update-reset"],
     title: "Confirm the reset",
     intro: "The iPad will ask you to confirm. This is expected.",
     todo: ["Tap Continue.", "Enter the iPad passcode if asked.", "Tap Erase iPad.", "Wait — the iPad restarts on its own."],
@@ -214,6 +259,8 @@ const ipadMiniSteps: WorkflowStep[] = [
   },
   {
     id: "power-on",
+    phase: "Setup",
+    paths: ["update-reset"],
     title: "Power on & wait for Hello",
     intro: "After the restart, the iPad shows a Hello screen.",
     todo: ["Keep the iPad plugged in.", "Wait for the Hello screen.", "Press the Home button or swipe up."],
@@ -223,6 +270,8 @@ const ipadMiniSteps: WorkflowStep[] = [
   },
   {
     id: "language",
+    phase: "Setup",
+    paths: ["update-reset"],
     title: "Choose language & region",
     intro: "Pick your language and country.",
     todo: ["Tap English (or your language).", "Tap United States (or your region)."],
@@ -232,6 +281,8 @@ const ipadMiniSteps: WorkflowStep[] = [
   },
   {
     id: "wifi",
+    phase: "Setup",
+    paths: ["update-reset"],
     title: "Connect to Wi-Fi",
     intro: "The iPad needs Wi-Fi for the next steps.",
     todo: ["Tap the Wi-Fi network you were told to use.", "Enter the password if asked.", "Wait for the checkmark.", "Tap Next."],
@@ -241,6 +292,8 @@ const ipadMiniSteps: WorkflowStep[] = [
   },
   {
     id: "account",
+    phase: "Setup",
+    paths: ["update-reset"],
     title: "Sign in with your Sprinter Health account",
     intro: "Use the Sprinter Health account IT gave you.",
     todo: ["Enter your Sprinter Health email.", "Tap Next.", "Enter your password.", "Complete any sign-in prompt you normally use."],
@@ -252,6 +305,8 @@ const ipadMiniSteps: WorkflowStep[] = [
   },
   {
     id: "configure",
+    phase: "Configure",
+    paths: ["update-reset"],
     kind: "waiting",
     title: "Device configuration",
     intro: "Your iPad is being configured. This may take several minutes.",
@@ -262,6 +317,8 @@ const ipadMiniSteps: WorkflowStep[] = [
   },
   {
     id: "setup",
+    phase: "Configure",
+    paths: ["update-reset"],
     title: "Finish setup",
     intro: "Follow the on-screen instructions.",
     todo: ["Create a passcode if asked.", "Set up Touch ID or Face ID if asked.", "Wait for apps to install."],
@@ -272,6 +329,7 @@ const ipadMiniSteps: WorkflowStep[] = [
   },
   {
     id: "verify",
+    phase: "Verify",
     kind: "complete",
     title: "You're all set",
     intro: "Check the home screen for your Sprinter Health apps.",
@@ -289,18 +347,32 @@ const ipadMiniSteps: WorkflowStep[] = [
 const patientIpadSteps: WorkflowStep[] = [
   {
     id: "update",
+    phase: "Update",
     title: "Update the Patient-Facing iPad",
     intro: "This is the larger iPad used during patient visits. Update it first.",
     todo: ["Open Settings.", "Tap General in the left column.", "Tap Software Update.", "If an update is available, tap Download and Install.", "Wait for the update to finish."],
     screen: { kind: "list", title: "General", rows: [{ label: "About" }, { label: "Software Update", highlight: true }, { label: "AirDrop" }, { label: "iPad Storage" }] },
     lookFor: "Software Update",
     why: updateWhy,
-    nextLabel: "Update is done",
+    nextLabel: "Update is done — check it",
+  },
+  {
+    id: "verify-update",
+    phase: "Verify",
+    kind: "verify-version",
+    title: "Update complete?",
+    intro: "Let's make sure your iPad finished updating.",
+    screen: { kind: "list", title: "Software Update", rows: [{ label: "Automatic Updates", value: "On" }, { label: "iOS version", value: "See IT instructions", highlight: true }, { label: "Your iPad is up to date" }] },
+    lookFor: "The software version shown on your iPad",
+    why: { title: "Why check the version?", body: "The app cannot see your iPad. Only you can confirm the update finished. Checking the version makes sure the next steps will work." },
+    nextLabel: "Version confirmed — continue",
   },
   {
     id: "reset",
-    title: "Reset the Patient-Facing iPad (if required)",
-    intro: "Only do this if IT asked you to reset this iPad.",
+    phase: "Reset",
+    paths: ["update-reset"],
+    title: "Erase & reset the Patient-Facing iPad",
+    intro: "IT asked for Update + Reset. Now we erase the iPad so it can join the new system.",
     resetGate: true,
     todo: ["Open Settings.", "Tap General.", "Scroll down and tap Transfer or Reset iPad.", "Tap Erase All Content and Settings.", "Follow the prompts."],
     screen: { kind: "list", title: "Transfer or Reset iPad", rows: [{ label: "Prepare for New iPad" }, { label: "Reset" }, { label: "Erase All Content and Settings", highlight: true }] },
@@ -310,6 +382,8 @@ const patientIpadSteps: WorkflowStep[] = [
   },
   {
     id: "confirm-reset",
+    phase: "Reset",
+    paths: ["update-reset"],
     title: "Confirm the reset",
     intro: "The iPad will ask you to confirm. This is expected.",
     todo: ["Tap Continue.", "Enter the iPad passcode if asked.", "Tap Erase iPad.", "Wait — the iPad restarts on its own."],
@@ -319,6 +393,8 @@ const patientIpadSteps: WorkflowStep[] = [
   },
   {
     id: "start-setup",
+    phase: "Setup",
+    paths: ["update-reset"],
     title: "Start setup",
     intro: "After the restart, the iPad shows a Hello screen.",
     todo: ["Keep the iPad plugged in.", "Wait for the Hello screen.", "Press the Home button or swipe up."],
@@ -328,6 +404,8 @@ const patientIpadSteps: WorkflowStep[] = [
   },
   {
     id: "language",
+    phase: "Setup",
+    paths: ["update-reset"],
     title: "Choose language & region",
     intro: "Pick your language and country.",
     todo: ["Tap English (or your language).", "Tap United States (or your region)."],
@@ -337,6 +415,8 @@ const patientIpadSteps: WorkflowStep[] = [
   },
   {
     id: "wifi",
+    phase: "Setup",
+    paths: ["update-reset"],
     title: "Connect to Wi-Fi",
     intro: "The iPad needs Wi-Fi for the next steps.",
     todo: ["Tap the Wi-Fi network you were told to use.", "Enter the password if asked.", "Wait for the checkmark.", "Tap Next."],
@@ -346,6 +426,8 @@ const patientIpadSteps: WorkflowStep[] = [
   },
   {
     id: "account",
+    phase: "Setup",
+    paths: ["update-reset"],
     title: "Account & configuration",
     intro: "Sign in with the Sprinter Health account IT gave you for this iPad.",
     todo: ["Enter the Sprinter Health email for this iPad.", "Tap Next.", "Enter the password.", "Complete any sign-in prompt shown."],
@@ -358,6 +440,8 @@ const patientIpadSteps: WorkflowStep[] = [
   },
   {
     id: "wait",
+    phase: "Configure",
+    paths: ["update-reset"],
     kind: "waiting",
     title: "Please wait",
     intro: "Your iPad is being configured. This may take several minutes.",
@@ -368,6 +452,8 @@ const patientIpadSteps: WorkflowStep[] = [
   },
   {
     id: "auth",
+    phase: "Configure",
+    paths: ["update-reset"],
     title: "Authentication (if required)",
     intro: "The iPad may ask you to sign in one more time. That is normal.",
     todo: ["If asked, sign in again with the same Sprinter Health account.", "Complete any sign-in prompt shown.", "If nothing is asked, just continue."],
@@ -379,6 +465,7 @@ const patientIpadSteps: WorkflowStep[] = [
   },
   {
     id: "verify",
+    phase: "Verify",
     title: "Verify the iPad",
     intro: "Check the home screen for the patient-visit apps.",
     todo: ["Look at the home screen.", "Make sure the Sprinter Health patient apps are there.", "Open one app to make sure it starts."],
@@ -389,6 +476,7 @@ const patientIpadSteps: WorkflowStep[] = [
   },
   {
     id: "complete",
+    phase: "Verify",
     kind: "complete",
     title: "You're all set",
     intro: "The Patient-Facing iPad has completed the migration steps.",
@@ -406,7 +494,20 @@ function withSequences(device: DeviceId, steps: WorkflowStep[]): WorkflowStep[] 
   });
 }
 
-const checklist = ["Device updated", "Reset completed if required", "Setup completed", "Configuration completed", "Device checked"];
+const checklist: Record<MigrationPath, string[]> = {
+  update: ["Device updated", "Software version checked", "Device checked"],
+  "update-reset": ["Device updated", "Software version checked", "Reset completed", "Setup completed", "Configuration completed", "Device checked"],
+};
+
+export const patientNote = {
+  title: "Patient-Facing device",
+  lines: [
+    "This device is used during patient visits.",
+    "It may look different from your regular Sprinter iPhone or iPad.",
+    "That is expected.",
+    "If the screen does not match this guide, use Need Help.",
+  ],
+};
 
 export const workflows: Record<DeviceId, DeviceWorkflow> = {
   iphone: {
@@ -438,6 +539,7 @@ export const workflows: Record<DeviceId, DeviceWorkflow> = {
     frame: "tablet-wide",
     steps: withSequences("patient-ipad", patientIpadSteps),
     completionChecklist: checklist,
+    note: patientNote,
   },
 };
 
@@ -445,4 +547,19 @@ export const deviceOrder: DeviceId[] = ["iphone", "ipad-mini", "patient-ipad"];
 
 export function isDeviceId(v: string): v is DeviceId {
   return v in workflows;
+}
+
+/** Steps for the path IT asked for. Update-only skips every reset/setup step. */
+export function stepsFor(workflow: DeviceWorkflow, path: MigrationPath): WorkflowStep[] {
+  return workflow.steps.filter((s) => !s.paths || s.paths.includes(path));
+}
+
+/** Ordered, de-duplicated phase labels for the route overview, e.g. Update → Verify → Reset → Setup → Configure → Verify */
+export function phasesFor(workflow: DeviceWorkflow, path: MigrationPath): string[] {
+  const out: string[] = [];
+  for (const s of stepsFor(workflow, path)) {
+    const ph = s.phase ?? "Step";
+    if (out[out.length - 1] !== ph) out.push(ph);
+  }
+  return out;
 }

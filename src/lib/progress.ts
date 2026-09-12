@@ -1,21 +1,24 @@
 import { useSyncExternalStore } from "react";
-import type { DeviceId } from "./workflow-types";
-import { deviceOrder, workflows } from "@/content/workflows";
+import type { DeviceId, MigrationPath } from "./workflow-types";
+import { deviceOrder, stepsFor, workflows } from "@/content/workflows";
 
 export type DeviceProgress = {
-  current: number; // 0-based step index
+  /** What IT asked for. null = not chosen yet (the app never assumes). */
+  path: MigrationPath | null;
+  current: number; // 0-based step index within stepsFor(workflow, path)
   completed: number[];
   gates: string[]; // step ids where the reset gate was confirmed
   simDone: number[]; // step indexes whose tap-along sequence was finished
+  verified: number[]; // step indexes where the Sprinter confirmed a version match
   finished: boolean;
   started: boolean;
 };
 
 export type ProgressState = Record<DeviceId, DeviceProgress>;
 
-const KEY = "sh-migration-progress-v2";
+const KEY = "sh-migration-progress-v3";
 
-const emptyDevice = (): DeviceProgress => ({ current: 0, completed: [], gates: [], simDone: [], finished: false, started: false });
+const emptyDevice = (): DeviceProgress => ({ path: null, current: 0, completed: [], gates: [], simDone: [], verified: [], finished: false, started: false });
 const emptyState = (): ProgressState => ({ iphone: emptyDevice(), "ipad-mini": emptyDevice(), "patient-ipad": emptyDevice() });
 
 const SERVER_SNAPSHOT = emptyState();
@@ -27,6 +30,7 @@ function normalize(raw: Partial<ProgressState>): ProgressState {
   for (const d of deviceOrder) {
     base[d] = { ...base[d], ...(raw[d] ?? {}) };
     if (!Array.isArray(base[d].simDone)) base[d].simDone = [];
+    if (!Array.isArray(base[d].verified)) base[d].verified = [];
   }
   return base;
 }
@@ -66,7 +70,15 @@ function update(device: DeviceId, patch: (d: DeviceProgress) => DeviceProgress) 
   save({ ...s, [device]: patch(s[device]) });
 }
 
+export function totalSteps(device: DeviceId, p: DeviceProgress) {
+  return stepsFor(workflows[device], p.path ?? "update-reset").length;
+}
+
 export const progressActions = {
+  /** Choosing a path starts (or restarts) that device's journey. */
+  setPath(device: DeviceId, path: MigrationPath) {
+    update(device, (d) => (d.path === path ? { ...d, started: true } : { ...emptyDevice(), path, started: true }));
+  },
   start(device: DeviceId) {
     update(device, (d) => ({ ...d, started: true }));
   },
@@ -74,8 +86,8 @@ export const progressActions = {
     update(device, (d) => ({ ...d, started: true, current: Math.max(0, index) }));
   },
   completeAndNext(device: DeviceId, index: number) {
-    const total = workflows[device].steps.length;
     update(device, (d) => {
+      const total = totalSteps(device, d);
       const completed = d.completed.includes(index) ? d.completed : [...d.completed, index];
       const isLast = index >= total - 1;
       return { ...d, started: true, completed, current: isLast ? index : index + 1, finished: isLast || d.finished };
@@ -83,6 +95,9 @@ export const progressActions = {
   },
   markSimDone(device: DeviceId, index: number) {
     update(device, (d) => (d.simDone.includes(index) ? d : { ...d, simDone: [...d.simDone, index] }));
+  },
+  markVerified(device: DeviceId, index: number) {
+    update(device, (d) => (d.verified.includes(index) ? d : { ...d, verified: [...d.verified, index] }));
   },
   confirmGate(device: DeviceId, stepId: string) {
     update(device, (d) => ({ ...d, gates: d.gates.includes(stepId) ? d.gates : [...d.gates, stepId] }));
@@ -95,11 +110,11 @@ export const progressActions = {
   },
   loadDemo() {
     const s = emptyState();
-    const total = workflows.iphone.steps.length;
+    const total = stepsFor(workflows.iphone, "update-reset").length;
     const all = Array.from({ length: total }, (_, i) => i);
-    s.iphone = { current: total - 1, completed: all, simDone: all, gates: ["reset"], finished: true, started: true };
-    s["ipad-mini"] = { current: 0, completed: [], simDone: [], gates: [], finished: false, started: true };
-    s["patient-ipad"] = { current: 1, completed: [0], simDone: [0], gates: [], finished: false, started: true };
+    s.iphone = { path: "update-reset", current: total - 1, completed: all, simDone: all, verified: [1], gates: ["reset"], finished: true, started: true };
+    s["ipad-mini"] = { ...emptyDevice(), path: "update", started: true };
+    s["patient-ipad"] = { ...emptyDevice(), path: "update-reset", current: 1, completed: [0], simDone: [0], started: true };
     save(s);
   },
 };
@@ -108,14 +123,14 @@ export type DeviceStatus = "complete" | "in-progress" | "not-started";
 
 export function deviceStatus(p: DeviceProgress): DeviceStatus {
   if (p.finished) return "complete";
-  if (p.started || p.completed.length > 0) return "in-progress";
+  if (p.path && (p.started || p.completed.length > 0)) return "in-progress";
   return "not-started";
 }
 
 export function percent(device: DeviceId, p: DeviceProgress) {
-  const total = workflows[device].steps.length;
   if (p.finished) return 100;
-  return Math.round((p.completed.length / total) * 100);
+  if (!p.path) return 0;
+  return Math.round((p.completed.length / totalSteps(device, p)) * 100);
 }
 
 export function summary(s: ProgressState) {

@@ -26,11 +26,37 @@ export const whyMigration = {
 export const journey = ["Your device", "Update", "Reset if needed", "Set up again", "Ready"];
 
 export const resetWarning = {
-  title: "Before you reset",
-  body: "Resetting the device removes the information stored on the device. Make sure you are working on the device IT asked you to update.",
+  eyebrow: "Check one more time",
+  title: "Did your IT message tell you to reset this device?",
+  updated: "Your device is updated.",
+  next: "Now we'll erase and reset it.",
+  body: "This process will erase the device and require you to set it up again. Make sure this matches the instructions you received from Sprinter Health IT.",
   unsure: "Do not continue if you are unsure.",
-  confirm: "Yes — this is the correct device",
+  confirm: "Yes — continue",
+  back: "No — go back",
   help: "I need help",
+};
+
+export const pathChoice = {
+  question: "What did the IT message ask you to do?",
+  hint: "Choose the option that matches the instructions you received from Sprinter Health IT.",
+  update: { title: "Update only", body: "Update the device software." },
+  reset: { title: "Update + Reset", body: "Update the device and then erase/reset it." },
+  confirm: {
+    eyebrow: "Important",
+    title: "You selected Update + Reset.",
+    body: "Make sure this matches the instructions you received from Sprinter Health IT.",
+    warning: "This process will erase the device and require you to set it up again.",
+    yes: "Yes — this is what IT said",
+    back: "Go back",
+  },
+};
+
+export const deviceChooser = {
+  title: "Choose your device",
+  subtitle: "Select the device IT asked you to update.",
+  important: "The steps may be different for each device.",
+  outline: ["Update", "Reset if required", "Set up", "Verify"],
 };
 
 export const stopRules = [
@@ -69,22 +95,37 @@ export const supportMessage = {
 
 export const testflight = {
   what: "TestFlight is how Sprinter Health delivers the app to your device.",
+  rule: "Open the invitation email directly on the device you are working on. Do not open it on another device unless Field Support tells you to.",
   install: [
-    "Open the TestFlight invitation on this device.",
-    "Tap the invitation link.",
-    "Tap Install in TestFlight.",
-    "Wait for the app to appear on your home screen.",
+    "Open the Sprinter Health invitation email on this device.",
+    "Tap “View in TestFlight”. This opens TestFlight.",
+    "Sign in with your Sprinter Health email if prompted.",
+    "On the Sprinter Health page, tap Install.",
+    "Review and accept the app permissions.",
+    "Allow location access.",
+    "Allow camera access.",
+    "Allow notifications.",
+    "Open the Sprinter Health app.",
+    "Sign in with your Sprinter Health email.",
   ],
-  update: ["Open TestFlight.", "Find the Sprinter Health app.", "Tap Update.", "Wait for the update to finish."],
+  update: [
+    "Open the Sprinter Health invitation email on this device.",
+    "Tap “View in TestFlight”. This opens TestFlight.",
+    "Sign in with your Sprinter Health email if prompted.",
+    "On the Sprinter Health page, tap Update.",
+    "Wait for the update to finish.",
+    "Open the Sprinter Health app and sign in with your Sprinter Health email.",
+  ],
+  installVsUpdate: "If you already have the Sprinter Health app installed and an update is available, you may see UPDATE instead of INSTALL. That is not an error.",
   redeemCode: {
-    title: "Seeing a redeem code?",
+    title: "Having trouble with TestFlight?",
     warning: "Don't guess or enter a random code.",
     steps: [
-      "Make sure you are using the correct Sprinter Health Apple Account.",
-      "Open the invitation email directly on the affected device.",
-      "Tap the TestFlight invitation link again.",
-      "If the issue continues, contact Field Support.",
+      "Make sure you're using your Sprinter Health Apple account.",
+      "Open the invitation directly on the affected device.",
+      "If you see a Redeem Code screen, go back and open the TestFlight invitation again.",
     ],
+    still: "Still need help?",
   },
 };
 
