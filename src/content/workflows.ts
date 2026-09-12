@@ -278,7 +278,8 @@ const iphoneSteps: WorkflowStep[] = [
       ],
     },
     lookFor: "Apps appearing on your home screen",
-    whatNext: "Next, you will reinstall Sprinter Health with your original TestFlight invitation email.",
+    whatNext:
+      "Next, you will reinstall Sprinter Health with your original TestFlight invitation email.",
     nextLabel: "Continue to TestFlight",
   },
   {
@@ -552,7 +553,8 @@ const ipadMiniSteps: WorkflowStep[] = [
       ],
     },
     lookFor: "Apps appearing on your home screen",
-    whatNext: "Next, you will reinstall Sprinter Health with your original TestFlight invitation email.",
+    whatNext:
+      "Next, you will reinstall Sprinter Health with your original TestFlight invitation email.",
     nextLabel: "Continue to TestFlight",
   },
   {
@@ -823,7 +825,8 @@ const patientIpadSteps: WorkflowStep[] = [
     },
     lookFor: "A sign-in or verification prompt",
     extras: ["authError"],
-    whatNext: "Next, you will reinstall Sprinter Health with the original TestFlight invitation email.",
+    whatNext:
+      "Next, you will reinstall Sprinter Health with the original TestFlight invitation email.",
     nextLabel: "Continue to TestFlight",
     troubleshoot: {
       error:
