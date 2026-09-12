@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 import { ChevronDown, ChevronRight, MapPin } from "lucide-react";
 import { Logo } from "./Logo";
@@ -23,9 +23,18 @@ type Props = {
 
 /** Split layout: sticky "you are here" on top, practice device left / instructions right, sticky actions at the bottom. */
 export function StepShell({ deviceName, pathLabel, phases, currentPhase, index, total, completed, left, right, bottom, children }: Props) {
+  const [demoOpen, setDemoOpen] = useState(false);
   const phaseIdx = phases.findIndex((p, i) => p === currentPhase && (i === phases.length - 1 || p !== phases[i + 1] || true));
   // Highlight the *current* occurrence of a repeated phase (e.g. two "Verify") by walking with the step index.
   const current = currentPhaseIndex(phases, currentPhase, index, total, phaseIdx);
+
+  useEffect(() => {
+    const desktop = window.matchMedia("(min-width: 1024px)");
+    const sync = () => setDemoOpen(desktop.matches);
+    sync();
+    desktop.addEventListener("change", sync);
+    return () => desktop.removeEventListener("change", sync);
+  }, []);
 
   return (
     <div className="min-h-screen pb-36 lg:pb-28">
@@ -68,7 +77,11 @@ export function StepShell({ deviceName, pathLabel, phases, currentPhase, index, 
 
       <main className="mx-auto grid max-w-6xl gap-6 px-4 pt-5 lg:grid-cols-[minmax(0,440px)_1fr] lg:gap-10">
         <section aria-label="Practice demo" className="lg:sticky lg:top-28 lg:self-start">
-          <details className="group card-soft overflow-hidden lg:overflow-visible" name="practice-demo">
+          <details
+            className="group card-soft overflow-hidden lg:overflow-visible"
+            open={demoOpen}
+            onToggle={(event) => setDemoOpen(event.currentTarget.open)}
+          >
             <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between gap-3 px-4 py-3 text-base font-extrabold text-primary marker:content-none lg:hidden">
               <span>See a practice demo</span>
               <ChevronDown className="h-5 w-5 shrink-0 transition-transform group-open:rotate-180" aria-hidden />
