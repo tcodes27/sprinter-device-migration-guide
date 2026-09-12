@@ -5,7 +5,6 @@ import {
   ArrowLeft,
   ArrowRight,
   Check,
-  CircleHelp,
   Expand,
   Headset,
   Info,
@@ -23,7 +22,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Popover, PopoverClose, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { DeviceScreen } from "./DeviceScreen";
 import { DeviceSimulator } from "./DeviceSimulator";
 import { DeviceConfirmationCard } from "./ConfirmationCode";
@@ -130,7 +128,8 @@ export function StepView({ workflow, progress, path }: Props) {
     );
   }
 
-  const left = step.sequence ? (
+  const hasDemo = !!(step.sequence || step.screen);
+  const demo = step.sequence ? (
     <DeviceSimulator
       sequence={step.sequence}
       frame={workflow.frame}
@@ -146,6 +145,24 @@ export function StepView({ workflow, progress, path }: Props) {
         <Check className="h-8 w-8" aria-hidden />
       </span>
       <p className="text-lg font-extrabold">Device ready</p>
+    </div>
+  );
+
+  const left = (
+    <div className="space-y-4">
+      {demo}
+      {hasDemo && (
+        <div className="grid gap-2 border-t pt-4 sm:grid-cols-2">
+          <Button variant="soft" size="sm" onClick={() => setLightbox(true)}>
+            <Expand aria-hidden /> Show me bigger
+          </Button>
+          {!isComplete && (
+            <Button variant="outline" size="sm" onClick={() => setDifferent(true)}>
+              <TriangleAlert aria-hidden /> My screen looks different
+            </Button>
+          )}
+        </div>
+      )}
     </div>
   );
 
@@ -167,27 +184,6 @@ export function StepView({ workflow, progress, path }: Props) {
             {step.title}
           </h1>
           <p className="mt-2 text-lg text-muted-foreground">{step.intro}</p>
-          <div className="mt-3 flex flex-wrap gap-2">
-            {step.why && <WhyPopover title={step.why.title} body={step.why.body} />}
-            {step.whatNext && (
-              <WhyPopover
-                icon="next"
-                label="What happens next?"
-                title="What happens next?"
-                body={step.whatNext}
-              />
-            )}
-            {(step.sequence || step.screen) && (
-              <Button variant="soft" size="sm" onClick={() => setLightbox(true)}>
-                <Expand aria-hidden /> Show me bigger
-              </Button>
-            )}
-            {!isComplete && (
-              <Button variant="outline" size="sm" onClick={() => setDifferent(true)}>
-                <TriangleAlert aria-hidden /> My screen looks different
-              </Button>
-            )}
-          </div>
         </header>
 
         {workflow.note && index === 0 && (
@@ -279,7 +275,7 @@ export function StepView({ workflow, progress, path }: Props) {
   );
 
   const bottom = (
-    <div className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-3 sm:grid-cols-[auto_minmax(0,1fr)_auto]">
+    <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 sm:gap-3">
       <Button variant="ghost" size="lg" onClick={goBack} disabled={index === 0} aria-label="Back">
         <ArrowLeft aria-hidden /> <span className="hidden sm:inline">Back</span>
       </Button>
@@ -306,12 +302,19 @@ export function StepView({ workflow, progress, path }: Props) {
               </motion.span>
             )}
           </AnimatePresence>
-          <span className="truncate">
+          <span className="hidden truncate sm:inline">
             {isDone
               ? "Finish this device"
               : stepDone || isVerify || isComplete
                 ? step.nextLabel
                 : "I did all of this on my real device"}
+          </span>
+          <span className="sm:hidden">
+            {isDone
+              ? "Finish device"
+              : stepDone || isVerify || isComplete
+                ? step.nextLabel
+                : "Done with this step"}
           </span>
           <ArrowRight aria-hidden />
         </Button>
@@ -328,15 +331,10 @@ export function StepView({ workflow, progress, path }: Props) {
           </span>
         )}
       </div>
-      <Button
-        asChild
-        variant="ghost"
-        size="lg"
-        className="max-sm:col-span-2 max-sm:mr-40 max-sm:justify-self-start max-sm:h-10"
-      >
+      <Button asChild variant="ghost" size="lg" className="max-sm:h-11 max-sm:w-11 max-sm:px-0">
         <Link to="/" aria-label="Pause, progress saved">
           <PauseCircle aria-hidden />{" "}
-          <span>
+          <span className="hidden sm:inline">
             Pause<span className="hidden sm:inline"> · progress saved</span>
           </span>
         </Link>
@@ -405,37 +403,6 @@ export function StepView({ workflow, progress, path }: Props) {
 }
 
 /* ---------------- pieces ---------------- */
-
-function WhyPopover({
-  title,
-  body,
-  label = "Why?",
-  icon = "why",
-}: {
-  title: string;
-  body: string;
-  label?: string;
-  icon?: "why" | "next";
-}) {
-  return (
-    <Popover>
-      <PopoverTrigger asChild>
-        <Button variant="soft" size="sm">
-          {icon === "why" ? <CircleHelp aria-hidden /> : <Sparkles aria-hidden />} {label}
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent className="w-80 rounded-2xl p-5 shadow-float" align="start">
-        <h3 className="text-lg">{title}</h3>
-        <p className="mt-2 text-base font-semibold text-muted-foreground">{body}</p>
-        <PopoverClose asChild>
-          <Button size="lg" className="mt-4 w-full">
-            Got it
-          </Button>
-        </PopoverClose>
-      </PopoverContent>
-    </Popover>
-  );
-}
 
 function WaitingBanner() {
   return (

@@ -31,7 +31,17 @@ type Props = {
  * Tap-along practice device. The Sprinter taps the glowing element to move
  * through the same screens they will see on their real device.
  */
-export function DeviceSimulator({ sequence, frame, resetKey, syncIndex = 0, onScreenPassed, onComplete, onProgress, large, hideControls }: Props) {
+export function DeviceSimulator({
+  sequence,
+  frame,
+  resetKey,
+  syncIndex = 0,
+  onScreenPassed,
+  onComplete,
+  onProgress,
+  large,
+  hideControls,
+}: Props) {
   const reduce = useReducedMotion() ?? false;
   const last = sequence.length - 1;
   const start = Math.min(Math.max(0, syncIndex), last);
@@ -74,10 +84,13 @@ export function DeviceSimulator({ sequence, frame, resetKey, syncIndex = 0, onSc
       const p = phaseFor(screen);
       setPhase(p);
       if (p === "waiting" && screen.kind === "progress") {
-        later(() => {
-          if (!isAuto) onScreenPassed?.(next);
-          goTo(next + 1, isAuto);
-        }, reduce ? 700 : screen.durationMs);
+        later(
+          () => {
+            if (!isAuto) onScreenPassed?.(next);
+            goTo(next + 1, isAuto);
+          },
+          reduce ? 700 : screen.durationMs,
+        );
       }
       if (p === "done") {
         if (isAuto) {
@@ -92,7 +105,6 @@ export function DeviceSimulator({ sequence, frame, resetKey, syncIndex = 0, onSc
         }
       }
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [sequence, reduce, onComplete, onScreenPassed],
   );
 
@@ -121,10 +133,13 @@ export function DeviceSimulator({ sequence, frame, resetKey, syncIndex = 0, onSc
   useEffect(() => {
     if (!autoplay || phase !== "ready") return;
     later(() => setPressing(true), reduce ? 400 : 1000);
-    later(() => {
-      setPressing(false);
-      goTo(idx + 1, true);
-    }, reduce ? 650 : 1300);
+    later(
+      () => {
+        setPressing(false);
+        goTo(idx + 1, true);
+      },
+      reduce ? 650 : 1300,
+    );
     return clearTimers;
   }, [autoplay, phase, idx, goTo, reduce]);
 
@@ -153,27 +168,46 @@ export function DeviceSimulator({ sequence, frame, resetKey, syncIndex = 0, onSc
   };
 
   const screen = sequence[idx] ?? sequence[0]!;
-  const aspect = frame === "phone" ? "aspect-[9/18]" : frame === "tablet" ? "aspect-[3/4]" : "aspect-[4/3]";
-  const width = large ? "max-w-md" : frame === "phone" ? "max-w-[250px]" : frame === "tablet" ? "max-w-[300px]" : "max-w-[380px]";
+  const aspect =
+    frame === "phone" ? "aspect-[9/18]" : frame === "tablet" ? "aspect-[3/4]" : "aspect-[4/3]";
+  const width = large
+    ? "max-w-md"
+    : frame === "phone"
+      ? "max-w-[250px]"
+      : frame === "tablet"
+        ? "max-w-[300px]"
+        : "max-w-[380px]";
 
   return (
     <div className="flex flex-col items-center gap-3">
-      <div className="flex items-center gap-2 text-xs font-extrabold uppercase tracking-[0.18em] text-muted-foreground" aria-live="polite">
+      <div
+        className="flex items-center gap-2 text-xs font-extrabold uppercase tracking-[0.18em] text-muted-foreground"
+        aria-live="polite"
+      >
         {phase === "done" ? (
           <span className="flex items-center gap-1.5 rounded-full bg-success-soft px-3 py-1 text-success normal-case tracking-normal">
             <Check className="h-4 w-4" aria-hidden /> Nice, you did it
           </span>
         ) : autoplay ? (
-          <span className="rounded-full bg-primary-soft px-3 py-1 text-primary normal-case tracking-normal">Watch the glowing spot…</span>
+          <span className="rounded-full bg-primary-soft px-3 py-1 text-primary normal-case tracking-normal">
+            Watch the highlighted item…
+          </span>
         ) : phase === "waiting" ? (
-          <span className="rounded-full bg-primary-soft px-3 py-1 text-primary normal-case tracking-normal">Waiting, this is normal</span>
+          <span className="rounded-full bg-primary-soft px-3 py-1 text-primary normal-case tracking-normal">
+            Waiting, this is normal
+          </span>
         ) : (
-          <span>Practice device · tap the glowing spot</span>
+          <span>Practice device · tap the highlighted item</span>
         )}
       </div>
 
       <div key={wrong} className={cn("w-full", width, wrong > 0 && !reduce && "wiggle")}>
-        <div className={cn("relative overflow-hidden rounded-[2rem] border-[7px] border-deep bg-screen shadow-float", aspect)}>
+        <div
+          className={cn(
+            "relative overflow-hidden rounded-[2rem] border-[7px] border-deep bg-screen shadow-float",
+            aspect,
+          )}
+        >
           <div className="flex items-center justify-between px-4 pt-2 text-[10px] font-bold text-muted-foreground">
             <span>9:41</span>
             <Wifi className="h-3 w-3" aria-hidden />
@@ -189,7 +223,13 @@ export function DeviceSimulator({ sequence, frame, resetKey, syncIndex = 0, onSc
                 transition={{ duration: 0.28, ease: "easeOut" }}
                 className="absolute inset-0"
               >
-                <SimScreenRenderer screen={screen} onTap={handleTap} pressing={pressing} showCoach={coach && !autoplay} reducedMotion={reduce} />
+                <SimScreenRenderer
+                  screen={screen}
+                  onTap={handleTap}
+                  pressing={pressing}
+                  showCoach={coach && !autoplay}
+                  reducedMotion={reduce}
+                />
               </motion.div>
             </AnimatePresence>
           </div>
@@ -209,7 +249,13 @@ export function DeviceSimulator({ sequence, frame, resetKey, syncIndex = 0, onSc
           <Button type="button" variant="soft" size="sm" onClick={watch} disabled={autoplay}>
             <Play aria-hidden /> Watch me do it
           </Button>
-          <Button type="button" variant="ghost" size="sm" onClick={restart} disabled={idx === 0 && phase === "ready"}>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={restart}
+            disabled={idx === 0 && phase === "ready"}
+          >
             <RotateCcw aria-hidden /> Start over
           </Button>
         </div>

@@ -22,3 +22,12 @@
 - [x] Per-device confirmation codes issued on finish, persisted across refresh
 - [x] Master completion code + copyable summary on "You're all set" for the Field Support ticket reply
 - [x] Verify in browser (codes appear, copy works, refresh keeps them)
+
+## Mobile-first workflow cleanup
+
+- [x] Compact the mobile header labels and sizing
+- [x] Collapse the practice demo by default on mobile
+- [x] Move visual troubleshooting and enlargement controls into the demo
+- [x] Remove optional Why and What happens next controls
+- [x] Prevent Help and workflow actions from overlapping
+- [x] Verify mobile and desktop layouts and interactions
