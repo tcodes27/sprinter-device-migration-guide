@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 import { Logo } from "./Logo";
-import { ProgressDots } from "./StepView";
+import { ProgressDots } from "./ProgressDots";
 
 type Props = {
   deviceName: string;
