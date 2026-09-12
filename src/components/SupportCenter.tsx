@@ -45,7 +45,13 @@ export function SupportCenter() {
       </MotionButton>
 
       <Dialog open={isOpen} onOpenChange={(o) => (o ? open() : close())}>
-        <DialogContent className={cn("grid max-h-[94dvh] grid-rows-[auto_minmax(0,1fr)] gap-0 overflow-hidden rounded-t-3xl p-0 max-sm:bottom-0 max-sm:left-0 max-sm:top-auto max-sm:translate-x-0 max-sm:translate-y-0 sm:max-h-[92vh] sm:rounded-3xl", view === "chat" ? "max-w-lg" : "max-w-md")}>
+        <DialogContent
+          hideClose
+          className={cn(
+            "grid max-h-[94dvh] grid-rows-[auto_minmax(0,1fr)] gap-0 overflow-hidden rounded-t-3xl p-0 max-sm:bottom-0 max-sm:left-0 max-sm:top-auto max-sm:translate-x-0 max-sm:translate-y-0 sm:max-h-[92vh] sm:rounded-3xl",
+            view === "chat" ? "max-w-lg" : "max-w-md",
+          )}
+        >
           <div className={cn("border-b px-5 pb-4 pt-5 sm:px-6 sm:pt-6", view === "stop" && "rounded-t-3xl bg-danger-soft")}>
             <DialogHeader className="text-left">
               <div className="flex items-center justify-between gap-3">
