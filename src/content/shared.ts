@@ -129,6 +129,58 @@ export const testflight = {
   },
 };
 
+export const testflightAfterErase = {
+  title: "After Erase: Reinstall Sprinter Health",
+  eyebrow: "AFTER YOUR DEVICE IS ERASED",
+  intro:
+    "After your iPad or iPhone is erased, the Sprinter Health app will be removed. You will need to install it again using the TestFlight invitation email you received from Sprinter Health.",
+  steps: [
+    {
+      title: "Find your TestFlight invitation email",
+      body: "After your device is erased and set up again, open the work email account on the device. Find the email from Sprinter Health that says you have been invited to test the Sprinter Health app.",
+      note: "Do not look for the app on the Home Screen. It was removed when the device was erased.",
+    },
+    {
+      title: "Tap ‘View in TestFlight’",
+      body: "Open the Sprinter Health invitation email on the device. Tap the blue ‘View in TestFlight’ button in the email.",
+      warning: "Open the email directly on the iPad or iPhone. Do not open the link from a computer.",
+    },
+    {
+      title: "Open the Sprinter Health app in TestFlight",
+      body: "TestFlight will open and show the Sprinter Health app. If prompted, sign in with the Apple Account being used on the device.",
+    },
+    {
+      title: "Tap Install",
+      body: "On the Sprinter Health app page in TestFlight, tap the blue ‘Install’ button. Wait for the app to finish installing.",
+      note: "For an app that is already installed, the button may say ‘Update’ instead.",
+    },
+    {
+      title: "Accept the app permissions",
+      body: "When Sprinter Health asks for permission to use Location, Camera, Notifications, or other required features, tap Allow / OK / Continue as prompted.",
+      important:
+        "If you are setting up more than one device, it is best to complete the iPad setup first. Sometimes permissions do not sync correctly between devices. If TestFlight or the Sprinter Health app shows an error on one device, continue setting up the other device first and accept the requested permissions there. Then return to the device showing the error and try the TestFlight link again.",
+    },
+    {
+      title: "Open Sprinter Health",
+      body: "Once the app is installed, tap Open. Sign in using your Sprinter Health work email when prompted.",
+    },
+  ],
+  errorCard: {
+    title: "Seeing an error?",
+    bullets: [
+      "Make sure you opened the TestFlight invitation email on the device itself.",
+      "Make sure you are using the correct Sprinter Health Apple Account.",
+      "If another device is still being set up, finish that device and accept the requested permissions first.",
+      "Return to the TestFlight invitation email and tap ‘View in TestFlight’ again.",
+      "If the problem continues, reply to your support ticket or contact Field Support.",
+    ],
+  },
+  successCard: {
+    title: "App Installed!",
+    body: "Once the Sprinter Health app is installed, open it and sign in with your Sprinter Health work email. You are ready to continue setup.",
+  },
+};
+
 export const permissions = [
   { name: "Location", does: "Helps the app know where visits happen.", tap: "Tap Allow While Using App." },
   { name: "Camera", does: "Lets the app take photos when needed for a visit.", tap: "Tap Allow." },
