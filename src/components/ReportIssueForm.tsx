@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { deviceOrder, workflows } from "@/content/workflows";
 
-type Props = { issueType?: string; defaultDevice?: string };
+type Props = { issueType?: string | undefined; defaultDevice?: string | undefined };
 
 /**
  * Prototype only: collects the report and shows a confirmation.

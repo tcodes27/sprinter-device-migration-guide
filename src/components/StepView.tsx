@@ -19,7 +19,7 @@ export function StepView({ workflow, progress }: Props) {
   const navigate = useNavigate();
   const reduce = useReducedMotion();
   const index = Math.min(progress.current, workflow.steps.length - 1);
-  const step = workflow.steps[index];
+  const step = workflow.steps[index]!;
   const total = workflow.steps.length;
   const [different, setDifferent] = useState(false);
   const [lightbox, setLightbox] = useState(false);
@@ -48,7 +48,7 @@ export function StepView({ workflow, progress }: Props) {
           key={`${step.id}-${gateNeeded}`}
           initial={reduce ? false : { opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          exit={reduce ? undefined : { opacity: 0, y: -12 }}
+          exit={{ opacity: 0, y: reduce ? 0 : -12 }}
           transition={{ duration: 0.25 }}
           aria-labelledby="step-title"
         >

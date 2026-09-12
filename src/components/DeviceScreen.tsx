@@ -28,7 +28,7 @@ export function DeviceScreen({ screen, frame, lookFor, large }: Props) {
   );
 }
 
-function Highlight({ children, on }: { children: React.ReactNode; on?: boolean }) {
+function Highlight({ children, on }: { children: React.ReactNode; on?: boolean | undefined }) {
   return (
     <div className={cn("relative rounded-xl", on && "ring-4 ring-warning ring-offset-2 ring-offset-screen")}>
       {children}
