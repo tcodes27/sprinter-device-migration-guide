@@ -38,3 +38,6 @@
 - [x] Add a separate accessible dismiss action
 - [x] Restore the floating control after page navigation
 - [x] Verify dismissal, navigation reset, and responsive presentation
+
+## QA fixes (browser back, required final questions, truthful copy, safety dialogs, storage handling, a11y)
+- [x] QA-1..QA-9 implemented and verified with Playwright (see chat summary)

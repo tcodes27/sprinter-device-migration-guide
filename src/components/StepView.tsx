@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import {
@@ -27,6 +27,7 @@ import { DeviceSimulator } from "./DeviceSimulator";
 import { DeviceConfirmationCard } from "./ConfirmationCode";
 import { InstructionPanel } from "./InstructionPanel";
 import { StepShell } from "./StepShell";
+import { StorageNotice } from "./StorageNotice";
 import { HoldToConfirm } from "./HoldToConfirm";
 import { TroubleshootDialog } from "./TroubleshootDialog";
 import { VersionCheck } from "./VersionCheck";
@@ -46,19 +47,26 @@ import {
   type MigrationPath,
   type WorkflowStep,
 } from "@/lib/workflow-types";
-import { percent, progressActions, type DeviceProgress } from "@/lib/progress";
+import { healthAnswered, percent, progressActions, useStorageStatus, type DeviceProgress } from "@/lib/progress";
 import { checkpointsFor, firstIncomplete, isStepComplete } from "@/lib/checkpoints";
 import { useSupport, useSupportLocation } from "@/lib/support";
 import { cn } from "@/lib/utils";
 
 export { ProgressDots } from "./ProgressDots";
 
-type Props = { workflow: DeviceWorkflow; progress: DeviceProgress; path: MigrationPath };
+type Props = {
+  workflow: DeviceWorkflow;
+  progress: DeviceProgress;
+  path: MigrationPath;
+  /** 1-based step from the URL (`?step=N`), used only to keep browser Back/Forward in sync */
+  urlStep?: number | undefined;
+};
 
-export function StepView({ workflow, progress, path }: Props) {
+export function StepView({ workflow, progress, path, urlStep }: Props) {
   const navigate = useNavigate();
   const reduce = useReducedMotion();
   const { open: openSupport } = useSupport();
+  const { saveOk } = useStorageStatus();
   const steps = stepsFor(workflow, path);
   const total = steps.length;
   const index = Math.min(progress.current, total - 1);
@@ -70,6 +78,7 @@ export function StepView({ workflow, progress, path }: Props) {
   const gateNeeded = !!step.resetGate && !progress.gates.includes(step.id);
   const isComplete = step.kind === "complete";
   const isVerify = step.kind === "verify-version";
+  const isLast = index === total - 1;
 
   // Checkpoints: the saved, task-level state of this step
   const checkpoints = checkpointsFor(step);
@@ -78,7 +87,8 @@ export function StepView({ workflow, progress, path }: Props) {
   const stepDone = isStepComplete(checkpoints, done);
   const verified = progress.verified.includes(index);
   const answer = progress.answers?.[step.id] ?? null;
-  const canAdvance = isVerify ? verified : true;
+  const healthOk = healthAnswered(progress);
+  const canAdvance = isVerify ? verified : isLast ? healthOk || progress.finished : true;
   const isDone = progress.finished && index === total - 1;
   const currentAction = !stepDone && !gateNeeded ? checkpoints[current]?.label : undefined;
   const mobileNextLabel =
@@ -96,9 +106,35 @@ export function StepView({ workflow, progress, path }: Props) {
     completed: progress.finished,
   });
 
+  // Browser history: mirror the saved step into `?step=N` and follow the URL when Back/Forward changes it.
+  // Only a real step change pushes an entry, so repeated renders or rapid clicks never create duplicates.
+  const lastIndex = useRef(index);
+  const lastUrl = useRef(urlStep);
+  useEffect(() => {
+    const indexChanged = lastIndex.current !== index;
+    const urlChanged = lastUrl.current !== urlStep;
+    lastIndex.current = index;
+    lastUrl.current = urlStep;
+    if (urlStep === index + 1) return;
+    const search = (s: number) => ({ step: s });
+    if (urlChanged && !indexChanged && urlStep !== undefined) {
+      // The URL moved (Back/Forward/typed): follow it, but never past what has been reached.
+      const reachable = Math.max(index, ...progress.completed.map((c) => c + 1));
+      const target = Math.min(Math.max(0, urlStep - 1), reachable, total - 1);
+      if (target !== index) progressActions.goTo(workflow.id, target);
+      if (target !== urlStep - 1) {
+        navigate({ to: "/device/$deviceId", params: { deviceId: workflow.id }, search: search(target + 1), replace: true });
+      }
+      return;
+    }
+    // The step changed in the app (or first load): reflect it in the URL.
+    navigate({ to: "/device/$deviceId", params: { deviceId: workflow.id }, search: search(index + 1), replace: !indexChanged });
+  }, [index, urlStep, workflow.id, total, progress.completed, navigate]);
+
   const goBack = () => index > 0 && progressActions.goTo(workflow.id, index - 1);
   const goNext = () => {
     if (!canAdvance) return;
+    if (isLast && !progress.finished && !healthOk) return;
     // Anything the app could not detect is confirmed by the Sprinter here, so a step is never complete with open tasks.
     if (!stepDone) progressActions.confirmRemaining(workflow.id, step.id, checkpoints.length);
     progressActions.completeAndNext(workflow.id, index);
@@ -188,6 +224,7 @@ export function StepView({ workflow, progress, path }: Props) {
         transition={{ duration: 0.25 }}
         className="space-y-5"
       >
+        <StorageNotice />
         <header>
           <p className="text-sm font-extrabold uppercase tracking-[0.18em] text-primary">
             Step {index + 1} · {workflow.name} · {pathLabels[path]}
@@ -268,7 +305,7 @@ export function StepView({ workflow, progress, path }: Props) {
         {step.extras?.includes("testflightAfterErase") && <TestFlightPanel />}
         {step.extras?.includes("permissions") && <PermissionsPanel />}
 
-        {isComplete && <CompletionPanel workflow={workflow} path={path} />}
+        {isComplete && <CompletionPanel workflow={workflow} path={path} health={progress.health} />}
 
         <aside className="rounded-2xl bg-muted/60 p-4">
           <p className="text-base font-extrabold">{supportMessage.title}</p>
@@ -335,6 +372,11 @@ export function StepView({ workflow, progress, path }: Props) {
             Answer the version question above to continue
           </span>
         )}
+        {isLast && !healthOk && (
+          <span className="text-center text-xs font-bold text-warning-foreground" role="status">
+            Answer the two questions above to finish
+          </span>
+        )}
         {!isVerify && !stepDone && !isComplete && (
           <span className="hidden text-center text-xs font-bold text-muted-foreground sm:block">
             {step.sequence
@@ -344,10 +386,10 @@ export function StepView({ workflow, progress, path }: Props) {
         )}
       </div>
       <Button asChild variant="ghost" size="lg" className="max-sm:h-11 max-sm:w-11 max-sm:px-0">
-        <Link to="/" aria-label="Pause, progress saved">
+        <Link to="/" aria-label={saveOk ? "Pause, progress saved" : "Pause"}>
           <PauseCircle aria-hidden />{" "}
           <span className="hidden sm:inline">
-            Pause<span className="hidden sm:inline"> · progress saved</span>
+            Pause{saveOk && <span className="hidden sm:inline"> · progress saved</span>}
           </span>
         </Link>
       </Button>
@@ -720,10 +762,21 @@ function PermissionsPanel() {
   );
 }
 
-function CompletionPanel({ workflow, path }: { workflow: DeviceWorkflow; path: MigrationPath }) {
+function CompletionPanel({
+  workflow,
+  path,
+  health,
+}: {
+  workflow: DeviceWorkflow;
+  path: MigrationPath;
+  health: DeviceProgress["health"];
+}) {
   const { open } = useSupport();
-  const [conn, setConn] = useState<"yes" | "no" | null>(null);
-  const [other, setOther] = useState<"yes" | "no" | null>(null);
+  // Persisted so the answers survive refresh and Finish can be gated on them.
+  const conn = health.connectivity;
+  const other = health.other;
+  const setConn = (v: "yes" | "no") => progressActions.setHealthAnswer(workflow.id, "connectivity", v);
+  const setOther = (v: "yes" | "no") => progressActions.setHealthAnswer(workflow.id, "other", v);
   return (
     <div className="space-y-5">
       <DeviceConfirmationCard device={workflow.id} />

@@ -16,7 +16,9 @@ type Props = { issueType?: string | undefined; defaultDevice?: string | undefine
 export function ReportIssueForm({ issueType, defaultDevice }: Props) {
   const [sent, setSent] = useState(false);
   const [device, setDevice] = useState(defaultDevice ?? "");
+  const [deviceMissing, setDeviceMissing] = useState(false);
   const [frequency, setFrequency] = useState("");
+  const [fileName, setFileName] = useState("");
   const isConnectivity = issueType === "connectivity";
 
   if (sent) {
@@ -35,6 +37,11 @@ export function ReportIssueForm({ issueType, defaultDevice }: Props) {
       className="card-soft space-y-6 p-6"
       onSubmit={(e) => {
         e.preventDefault();
+        if (!device) {
+          setDeviceMissing(true);
+          document.getElementById("device-choice")?.focus();
+          return;
+        }
         setSent(true);
       }}
     >
@@ -43,15 +50,33 @@ export function ReportIssueForm({ issueType, defaultDevice }: Props) {
         <p className="mt-1 text-base text-muted-foreground">Short answers are fine. You don't need technical words.</p>
       </div>
 
-      <fieldset className="space-y-2">
-        <legend className="text-sm font-extrabold uppercase tracking-wide text-muted-foreground">Device, which device are you using?</legend>
+      <fieldset className="space-y-2" aria-required="true" aria-describedby={deviceMissing ? "device-error" : undefined} aria-invalid={deviceMissing || undefined}>
+        <legend className="text-sm font-extrabold uppercase tracking-wide text-muted-foreground">
+          Device, which device are you using? <span className="text-danger">(required)</span>
+        </legend>
         <div className="grid gap-2 sm:grid-cols-3">
-          {deviceOrder.map((d) => (
-            <Button key={d} type="button" variant={device === d ? "default" : "outline"} size="lg" onClick={() => setDevice(d)} aria-pressed={device === d}>
+          {deviceOrder.map((d, i) => (
+            <Button
+              key={d}
+              id={i === 0 ? "device-choice" : undefined}
+              type="button"
+              variant={device === d ? "default" : "outline"}
+              size="lg"
+              onClick={() => {
+                setDevice(d);
+                setDeviceMissing(false);
+              }}
+              aria-pressed={device === d}
+            >
               {workflows[d].name}
             </Button>
           ))}
         </div>
+        {deviceMissing && (
+          <p id="device-error" role="alert" className="rounded-xl bg-danger/10 px-3 py-2 text-sm font-bold text-danger">
+            Choose which device this is about before sending.
+          </p>
+        )}
       </fieldset>
 
       <div className="space-y-2">
@@ -94,9 +119,12 @@ export function ReportIssueForm({ issueType, defaultDevice }: Props) {
           Photo, attach a screenshot if useful (optional)
         </Label>
         <label htmlFor="photo" className="flex min-h-14 cursor-pointer items-center gap-3 rounded-xl border-2 border-dashed border-primary/30 bg-primary-soft/50 px-4 text-base font-bold text-primary">
-          <Paperclip aria-hidden /> Choose a photo
-          <input id="photo" type="file" accept="image/*" className="sr-only" />
+          <Paperclip className="shrink-0" aria-hidden /> <span className="min-w-0 truncate">{fileName || "Choose a photo"}</span>
+          <input id="photo" type="file" accept="image/*" className="sr-only" aria-describedby="photo-note" onChange={(e) => setFileName(e.target.files?.[0]?.name ?? "")} />
         </label>
+        <p id="photo-note" className="text-sm font-semibold text-muted-foreground">
+          Prototype: photos are not uploaded or sent anywhere. Keep the screenshot on your device to show Field Support.
+        </p>
       </div>
 
       <Button type="submit" size="xl">
