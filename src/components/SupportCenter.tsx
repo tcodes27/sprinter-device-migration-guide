@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
+import { useLocation } from "@tanstack/react-router";
 import {
   ArrowLeft,
   Camera,
@@ -25,8 +26,6 @@ import { support as supportCopy } from "@/content/config";
 import { useSupport, type SupportLocation, type SupportView } from "@/lib/support";
 import { cn } from "@/lib/utils";
 
-const MotionButton = motion.create(Button);
-
 /**
  * The one Field Support surface for the whole app.
  * Floating "Need help?" button + a dialog that never touches progress:
@@ -34,6 +33,12 @@ const MotionButton = motion.create(Button);
  */
 export function SupportCenter() {
   const { isOpen, open, close, view, setView, issue, setIssue, location } = useSupport();
+  const pathname = useLocation({ select: (state) => state.pathname });
+  const [launcherDismissed, setLauncherDismissed] = useState(false);
+
+  useEffect(() => {
+    setLauncherDismissed(false);
+  }, [pathname]);
 
   const titleFor: Record<SupportView, string> = {
     menu: "Need help?",
@@ -46,20 +51,37 @@ export function SupportCenter() {
 
   return (
     <>
-      <MotionButton
-        type="button"
-        size="sm"
-        onClick={() => open({ view: location?.completed ? "after" : "menu" })}
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        whileTap={{ scale: 0.96 }}
-        className="fixed bottom-24 right-3 z-40 min-h-12 rounded-full px-3 text-sm shadow-float sm:bottom-5 sm:right-4 sm:min-h-14 sm:px-5 sm:text-base"
-        aria-label="Need help? Contact Field Support"
-      >
-        <LifeBuoy aria-hidden />
-        <span className="sm:hidden">Help</span>
-        <span className="hidden sm:inline">Need help?</span>
-      </MotionButton>
+      <AnimatePresence>
+        {!launcherDismissed && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.94 }}
+            className="fixed bottom-24 right-3 z-40 flex overflow-hidden rounded-full bg-primary shadow-float sm:bottom-5 sm:right-4"
+          >
+            <Button
+              type="button"
+              size="sm"
+              onClick={() => open({ view: location?.completed ? "after" : "menu" })}
+              className="min-h-12 gap-1.5 rounded-none rounded-l-full px-3 shadow-none sm:min-h-14 sm:px-4 sm:text-base"
+              aria-label="Need help? Contact Field Support"
+            >
+              <LifeBuoy aria-hidden />
+              <span className="sm:hidden">Help</span>
+              <span className="hidden sm:inline">Need help?</span>
+            </Button>
+            <Button
+              type="button"
+              size="icon"
+              onClick={() => setLauncherDismissed(true)}
+              className="h-auto min-h-12 w-11 rounded-none rounded-r-full border-l border-primary-foreground/30 px-0 shadow-none sm:min-h-14 sm:w-12"
+              aria-label="Hide floating Help button on this page"
+            >
+              <X aria-hidden />
+            </Button>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <Dialog open={isOpen} onOpenChange={(o) => (o ? open() : close())}>
         <DialogContent
