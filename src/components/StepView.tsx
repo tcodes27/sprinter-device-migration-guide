@@ -92,14 +92,8 @@ export function StepView({ workflow, progress, path }: Props) {
   }
 
   const left = step.sequence ? (
-    <DeviceSimulator
-      sequence={step.sequence}
-      frame={workflow.frame}
-      resetKey={`${workflow.id}-${step.id}`}
-      initiallyDone={savedDone}
-      onComplete={onSimComplete}
-      onProgress={onSimProgress}
-    />
+    <DeviceSimulator sequence={step.sequence} frame={workflow.frame} resetKey={`${workflow.id}-${step.id}`} syncIndex={current} onScreenPassed={onScreenPassed} />
+
   ) : step.screen ? (
     <DeviceScreen screen={step.screen} frame={workflow.frame} lookFor={step.lookFor} />
   ) : (
@@ -162,27 +156,26 @@ export function StepView({ workflow, progress, path }: Props) {
         {step.kind === "waiting" && <WaitingBanner />}
 
         {isVerify ? (
-          <VersionCheck
-            deviceName={workflow.name}
-            verified={verified}
-            onVerified={() => progressActions.markVerified(workflow.id, index)}
-            onBackToUpdate={goToUpdate}
-            onShowMe={() => setLightbox(true)}
-          />
-        ) : step.sequence ? (
-          <div>
-            <h2 className="mb-3 text-sm font-extrabold uppercase tracking-[0.18em] text-muted-foreground">What to do</h2>
-            <InstructionPanel sequence={step.sequence} index={sim.index} done={simDone} checked={stepChecks} onToggle={toggleCheck} />
+          <div className="space-y-4">
+            <div>
+              <h2 className="mb-3 text-sm font-extrabold uppercase tracking-[0.18em] text-muted-foreground">What to do</h2>
+              <InstructionPanel checkpoints={checkpoints} done={done} current={current} />
+            </div>
+            <VersionCheck
+              deviceName={workflow.name}
+              answer={answer}
+              onVerified={() => progressActions.markVerified(workflow.id, index, step.id)}
+              onAnswer={(a) => progressActions.setAnswer(workflow.id, index, step.id, a)}
+              onBackToUpdate={goToUpdate}
+              onShowMe={() => setLightbox(true)}
+            />
           </div>
         ) : (
-          step.todo && (
-            <ol className="space-y-3">
-              {step.todo.map((t, i) => (
-                <li key={t}>
-                  <TodoCheckItem label={t} number={i + 1} checked={stepChecks.includes(i)} onToggle={() => toggleCheck(i)} />
-                </li>
-              ))}
-            </ol>
+          checkpoints.length > 0 && (
+            <div>
+              <h2 className="mb-3 text-sm font-extrabold uppercase tracking-[0.18em] text-muted-foreground">What to do</h2>
+              <InstructionPanel checkpoints={checkpoints} done={done} current={current} onToggle={toggleCheck} />
+            </div>
           )
         )}
 
@@ -219,23 +212,27 @@ export function StepView({ workflow, progress, path }: Props) {
       <div className="flex min-w-0 flex-col items-stretch gap-1">
         <Button
           size="xl"
-          variant={isComplete ? "success" : simDone && canAdvance ? "default" : "outline"}
+          variant={isComplete ? "success" : stepDone && canAdvance ? "default" : "outline"}
           onClick={goNext}
           disabled={!canAdvance}
-          className={cn("relative overflow-hidden transition-all", simDone && canAdvance && !isComplete && "shadow-float")}
+          className={cn("relative overflow-hidden transition-all", stepDone && canAdvance && !isComplete && "shadow-float")}
         >
           <AnimatePresence initial={false}>
-            {simDone && canAdvance && (
+            {stepDone && canAdvance && (
               <motion.span key="check" initial={{ scale: 0, rotate: -40 }} animate={{ scale: 1, rotate: 0 }} className="flex">
                 <Check aria-hidden />
               </motion.span>
             )}
           </AnimatePresence>
-          <span className="truncate">{isDone ? "Finish this device" : step.nextLabel}</span>
+          <span className="truncate">{isDone ? "Finish this device" : stepDone || isVerify || isComplete ? step.nextLabel : "I did all of this on my real device"}</span>
           <ArrowRight aria-hidden />
         </Button>
         {isVerify && !verified && <span className="hidden text-center text-xs font-bold text-muted-foreground sm:block">Answer the version question above to continue</span>}
-        {!isVerify && !simDone && !isComplete && <span className="hidden text-center text-xs font-bold text-muted-foreground sm:block">Finish the practice device, or tap above if you already did this</span>}
+        {!isVerify && !stepDone && !isComplete && (
+          <span className="hidden text-center text-xs font-bold text-muted-foreground sm:block">
+            {step.sequence ? "Finish the practice device, or tap above if you already did every task" : "Tick each task, or tap above once you did all of them"}
+          </span>
+        )}
       </div>
       <Button asChild variant="ghost" size="lg" className="max-sm:col-span-2 max-sm:mr-40 max-sm:justify-self-start max-sm:h-10">
         <Link to="/" aria-label="Pause, progress saved">
@@ -256,7 +253,8 @@ export function StepView({ workflow, progress, path }: Props) {
             <DialogDescription className="text-base">{step.intro}</DialogDescription>
           </DialogHeader>
           {step.sequence ? (
-            <DeviceSimulator sequence={step.sequence} frame={workflow.frame} resetKey={`big-${step.id}`} large onComplete={onSimComplete} />
+            <DeviceSimulator sequence={step.sequence} frame={workflow.frame} resetKey={`big-${step.id}`} syncIndex={current} onScreenPassed={onScreenPassed} large />
+
           ) : step.screen ? (
             <DeviceScreen screen={step.screen} frame={workflow.frame} lookFor={step.lookFor} large />
           ) : null}
