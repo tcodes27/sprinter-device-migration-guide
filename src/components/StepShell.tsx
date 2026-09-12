@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
-import { ChevronRight, MapPin } from "lucide-react";
+import { ChevronDown, ChevronRight, MapPin } from "lucide-react";
 import { Logo } from "./Logo";
 import { ProgressDots } from "./ProgressDots";
 import { cn } from "@/lib/utils";
@@ -47,7 +47,7 @@ export function StepShell({ deviceName, pathLabel, phases, currentPhase, index, 
               <MapPin className="h-3.5 w-3.5" aria-hidden /> Step {index + 1} of {total}
             </span>
             <Link to="/" className="hidden rounded-xl px-3 py-1.5 text-sm font-bold text-muted-foreground hover:bg-muted sm:inline">
-              My devices
+              Devices
             </Link>
           </div>
         </div>
@@ -67,8 +67,14 @@ export function StepShell({ deviceName, pathLabel, phases, currentPhase, index, 
       </header>
 
       <main className="mx-auto grid max-w-6xl gap-6 px-4 pt-5 lg:grid-cols-[minmax(0,440px)_1fr] lg:gap-10">
-        <section aria-label="Practice device" className="lg:sticky lg:top-28 lg:self-start">
-          <div className="card-soft p-5">{left}</div>
+        <section aria-label="Practice demo" className="lg:sticky lg:top-28 lg:self-start">
+          <details className="group card-soft overflow-hidden lg:overflow-visible" name="practice-demo">
+            <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between gap-3 px-4 py-3 text-base font-extrabold text-primary marker:content-none lg:hidden">
+              <span>See a practice demo</span>
+              <ChevronDown className="h-5 w-5 shrink-0 transition-transform group-open:rotate-180" aria-hidden />
+            </summary>
+            <div className="border-t p-4 group-open:block lg:block lg:border-t-0 lg:p-5">{left}</div>
+          </details>
         </section>
         <section aria-label="Instructions" className="min-w-0">
           {right}
@@ -76,7 +82,7 @@ export function StepShell({ deviceName, pathLabel, phases, currentPhase, index, 
       </main>
 
       <div className="fixed inset-x-0 bottom-0 z-30 border-t bg-card/95 backdrop-blur">
-        <div className="mx-auto max-w-6xl px-4 py-3 pr-44 max-lg:pr-4">{bottom}</div>
+        <div className="mx-auto max-w-6xl px-3 py-2.5 sm:px-4 sm:py-3 lg:pr-44">{bottom}</div>
       </div>
       {children}
     </div>

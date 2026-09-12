@@ -164,11 +164,11 @@ export function DeviceSimulator({ sequence, frame, resetKey, syncIndex = 0, onSc
             <Check className="h-4 w-4" aria-hidden /> Nice, you did it
           </span>
         ) : autoplay ? (
-          <span className="rounded-full bg-primary-soft px-3 py-1 text-primary normal-case tracking-normal">Watch the glowing spot…</span>
+          <span className="rounded-full bg-primary-soft px-3 py-1 text-primary normal-case tracking-normal">Watch the highlighted item…</span>
         ) : phase === "waiting" ? (
           <span className="rounded-full bg-primary-soft px-3 py-1 text-primary normal-case tracking-normal">Waiting, this is normal</span>
         ) : (
-          <span>Practice device · tap the glowing spot</span>
+          <span>Practice device · tap the highlighted item</span>
         )}
       </div>
 

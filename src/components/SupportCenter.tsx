@@ -1,12 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { ArrowLeft, Camera, Check, Headset, LifeBuoy, MessageCircle, MessageSquareText, OctagonAlert, Send } from "lucide-react";
+import { ArrowLeft, Camera, Check, Headset, LifeBuoy, MessageCircle, MessageSquareText, OctagonAlert, Send, X } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { support as supportCopy } from "@/content/config";
 import { useSupport, type SupportLocation, type SupportView } from "@/lib/support";
 import { cn } from "@/lib/utils";
+
+const MotionButton = motion.create(Button);
 
 /**
  * The one Field Support surface for the whole app.
@@ -27,26 +29,33 @@ export function SupportCenter() {
 
   return (
     <>
-      <motion.button
+      <MotionButton
         type="button"
+        size="sm"
         onClick={() => open({ view: location?.completed ? "after" : "menu" })}
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         whileTap={{ scale: 0.96 }}
-        className="fixed bottom-5 right-4 z-40 flex min-h-14 items-center gap-2 rounded-full bg-primary px-5 text-base font-extrabold text-primary-foreground shadow-float focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring/40"
+        className="fixed bottom-24 right-3 z-40 min-h-12 rounded-full px-3 text-sm shadow-float sm:bottom-5 sm:right-4 sm:min-h-14 sm:px-5 sm:text-base"
         aria-label="Need help? Contact Field Support"
       >
         <LifeBuoy aria-hidden />
-        Need help?
-      </motion.button>
+        <span className="sm:hidden">Help</span>
+        <span className="hidden sm:inline">Need help?</span>
+      </MotionButton>
 
       <Dialog open={isOpen} onOpenChange={(o) => (o ? open() : close())}>
-        <DialogContent className={cn("max-h-[92vh] overflow-y-auto rounded-3xl p-0", view === "chat" ? "max-w-lg" : "max-w-md")}>
-          <div className={cn("px-6 pt-6", view === "stop" && "rounded-t-3xl bg-danger-soft")}>
+        <DialogContent className={cn("grid max-h-[94dvh] grid-rows-[auto_minmax(0,1fr)] gap-0 overflow-hidden rounded-t-3xl p-0 max-sm:bottom-0 max-sm:left-0 max-sm:top-auto max-sm:translate-x-0 max-sm:translate-y-0 sm:max-h-[92vh] sm:rounded-3xl", view === "chat" ? "max-w-lg" : "max-w-md")}>
+          <div className={cn("border-b px-5 pb-4 pt-5 sm:px-6 sm:pt-6", view === "stop" && "rounded-t-3xl bg-danger-soft")}>
             <DialogHeader className="text-left">
               <div className="flex items-center justify-between gap-3">
                 <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-primary">Field Support</p>
-                <DemoBadge />
+                <div className="flex items-center gap-2 pr-7">
+                  <DemoBadge />
+                  <Button variant="ghost" size="sm" className="h-10 px-2" onClick={close}>
+                    <X aria-hidden /> Close
+                  </Button>
+                </div>
               </div>
               <DialogTitle className="text-2xl">{titleFor[view]}</DialogTitle>
               <DialogDescription className="text-base">
@@ -60,7 +69,7 @@ export function SupportCenter() {
             </DialogHeader>
           </div>
 
-          <div className="px-6 pb-6">
+          <div className="min-h-0 overflow-y-auto px-5 pb-6 pt-4 sm:px-6">
             <AnimatePresence mode="wait" initial={false}>
               <motion.div key={view} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} transition={{ duration: 0.18 }}>
                 {view === "menu" && <MenuView location={location} onPick={setView} onClose={close} />}
