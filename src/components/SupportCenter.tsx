@@ -1,12 +1,10 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { useRouter } from "@tanstack/react-router";
 import {
   ArrowLeft,
   Camera,
   Check,
   Headset,
-  LifeBuoy,
   MessageCircle,
   MessageSquareText,
   OctagonAlert,
@@ -28,17 +26,10 @@ import { cn } from "@/lib/utils";
 
 /**
  * The one Field Support surface for the whole app.
- * Floating "Need help?" button + a dialog that never touches progress:
- * closing it returns the Sprinter to exactly where they were.
+ * A dialog that never touches progress: closing it returns the Sprinter to exactly where they were.
  */
 export function SupportCenter() {
   const { isOpen, open, close, view, setView, issue, setIssue, location } = useSupport();
-  const router = useRouter();
-  const [launcherDismissed, setLauncherDismissed] = useState(false);
-
-  useEffect(() => {
-    return router.subscribe("onResolved", () => setLauncherDismissed(false));
-  }, [router]);
 
   const titleFor: Record<SupportView, string> = {
     menu: "Need help?",
