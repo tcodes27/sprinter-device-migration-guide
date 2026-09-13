@@ -1,12 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { useRouter } from "@tanstack/react-router";
 import {
   ArrowLeft,
   Camera,
   Check,
   Headset,
-  LifeBuoy,
   MessageCircle,
   MessageSquareText,
   OctagonAlert,
@@ -28,17 +26,10 @@ import { cn } from "@/lib/utils";
 
 /**
  * The one Field Support surface for the whole app.
- * Floating "Need help?" button + a dialog that never touches progress:
- * closing it returns the Sprinter to exactly where they were.
+ * A dialog that never touches progress: closing it returns the Sprinter to exactly where they were.
  */
 export function SupportCenter() {
   const { isOpen, open, close, view, setView, issue, setIssue, location } = useSupport();
-  const router = useRouter();
-  const [launcherDismissed, setLauncherDismissed] = useState(false);
-
-  useEffect(() => {
-    return router.subscribe("onResolved", () => setLauncherDismissed(false));
-  }, [router]);
 
   const titleFor: Record<SupportView, string> = {
     menu: "Need help?",
@@ -51,38 +42,6 @@ export function SupportCenter() {
 
   return (
     <>
-      <AnimatePresence>
-        {!launcherDismissed && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.94 }}
-            className="fixed bottom-24 right-3 z-40 flex overflow-hidden rounded-full bg-primary shadow-float sm:bottom-5 sm:right-4"
-          >
-            <Button
-              type="button"
-              size="sm"
-              onClick={() => open({ view: location?.completed ? "after" : "menu" })}
-              className="min-h-12 gap-1.5 rounded-none rounded-l-full px-3 shadow-none sm:min-h-14 sm:px-4 sm:text-base"
-              aria-label="Need help? Contact Field Support"
-            >
-              <LifeBuoy aria-hidden />
-              <span className="sm:hidden">Help</span>
-              <span className="hidden sm:inline">Need help?</span>
-            </Button>
-            <Button
-              type="button"
-              size="icon"
-              onClick={() => setLauncherDismissed(true)}
-              className="h-auto min-h-12 w-11 rounded-none rounded-r-full border-l border-primary-foreground/30 px-0 shadow-none sm:min-h-14 sm:w-12"
-              aria-label="Hide floating Help button on this page"
-            >
-              <X aria-hidden />
-            </Button>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
       <Dialog open={isOpen} onOpenChange={(o) => (o ? open() : close())}>
         <DialogContent
           hideClose

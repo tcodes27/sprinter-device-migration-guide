@@ -13,6 +13,7 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { SupportProvider } from "../lib/support";
 import { SupportCenter } from "../components/SupportCenter";
+import { ScrollToTop } from "../components/ScrollToTop";
 
 function NotFoundComponent() {
   return (
@@ -124,6 +125,8 @@ function RootComponent() {
         <Outlet />
         {/* Field Support is reachable from every screen, the Sprinter is never alone. */}
         <SupportCenter />
+        {/* Scroll-to-top appears once the user has scrolled down the page. */}
+        <ScrollToTop />
       </SupportProvider>
     </QueryClientProvider>
   );
