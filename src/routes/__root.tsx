@@ -125,6 +125,8 @@ function RootComponent() {
         <Outlet />
         {/* Field Support is reachable from every screen, the Sprinter is never alone. */}
         <SupportCenter />
+        {/* Scroll-to-top appears once the user has scrolled down the page. */}
+        <ScrollToTop />
       </SupportProvider>
     </QueryClientProvider>
   );
